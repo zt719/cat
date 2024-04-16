@@ -18,32 +18,61 @@ open import Data.Empty public
 open import Data.List public
   using (List; []; _∷_)
 
-≡-refl : {i : Level} {A : UU i} {x : A}
+private variable i j : Level
+private variable A : UU i
+
+≡-refl : {x : A}
   → x ≡ x
 ≡-refl = refl
 
-≡-sym : {i : Level} {A : UU i} {x y : A}
+≡-sym : {x y : A}
   → x ≡ y → y ≡ x
 ≡-sym refl = refl
 
-≡-trans : {i : Level} {A : UU i} {x y z : A}
+≡-trans : {x y z : A}
   → y ≡ z → x ≡ y → x ≡ z
 ≡-trans refl refl = refl
 
-≡-left-id : {i : Level} {A : UU i} {x y : A}
+≡-left-id : {x y : A}
   → (p : x ≡ y)
   → ≡-trans ≡-refl p ≡ p
 ≡-left-id refl = refl
 
-≡-right-id : {i : Level} {A : UU i} {x y : A}
+≡-right-id : {x y : A}
   → (p : x ≡ y)
   → ≡-trans p ≡-refl ≡ p
 ≡-right-id refl = refl
 
-≡-assoc : {i : Level} {A : UU i} {x y z h : A}
+≡-assoc : {x y z h : A}
   → (p : z ≡ h) → (q : y ≡ z) → (r : x ≡ y)
   → ≡-trans (≡-trans p q) r ≡ ≡-trans p (≡-trans q r)
 ≡-assoc refl refl refl = refl
+
+→-refl : A → A
+→-refl a = a
+
+→-trans : {i j k : Level} {A : UU i} {B : UU j} {C : UU k}
+  → (B → C) → (A → B) → (A → C)
+→-trans f g x = f (g x)
+
+→-left-id : {i j : Level} {A : UU i} {B : UU j}
+  (f : A → B)
+  → →-trans →-refl f ≡ f
+→-left-id f = refl
+
+→-right-id : {i j : Level} {A : UU i} {B : UU j}
+  (f : A → B)
+  → →-trans f →-refl ≡ f
+→-right-id f = refl
+
+→-assoc : {i j k l : Level}
+  {A : UU i} {B : UU j}
+  {C : UU k} {D : UU l}
+  → (f : C → D)
+  → (g : B → C)
+  → (h : A → B)
+  → →-trans (→-trans f g) h ≡ →-trans f (→-trans g h)
+→-assoc f g h = refl
 
 ≤-refl : {a : ℕ}
   → a ≤ a
@@ -73,37 +102,37 @@ open import Data.List public
 ≤-assoc _ _ z≤n = refl
 ≤-assoc (s≤s f) (s≤s g) (s≤s h) = cong s≤s (≤-assoc f g h)
 
-reflexive : {i j : Level} {A : UU i}
+reflexive : {A : UU i}
   → (R : A → A → UU j)
   → UU (i ⊔ j)
 reflexive R = {x : _} → R x x
 
-symmetric : {i j : Level} {A : UU i}
-  → (R : A → A → UU j)
+symmetric : {A : UU i}
+  (R : A → A → UU j)
   → UU (i ⊔ j)
 symmetric R = {x y : _} → R x y → R y x
 
-transitive : {i j : Level} {A : UU i}
+transitive : {A : UU i}
   → (R : A → A → UU j)
   → UU (i ⊔ j)
 transitive R = {x y z : _} → R y z → R x y → R x z
 
 postulate
-  R-left-id : {i j : Level} {A : UU i} {x y : A}
+  R-left-id : {x y : A}
     → (R : A → A → UU j)
     → (f : R x y)
     → (r : reflexive R)
     → (t : transitive R)
     → t r f ≡ f
 
-  R-right-id : {i j : Level} {A : UU i} {x y : A}
+  R-right-id : {x y : A}
     → (R : A → A → UU j)
     → (f : R x y)
     → (r : reflexive R)
     → (t : transitive R)
     → t f r ≡ f
 
-  R-assoc : {i j : Level} {A : UU i} {a b c d : A}
+  R-assoc : {a b c d : A}
     → (R : A → A → UU j)
     → (f : R c d)
     → (g : R b c)
@@ -149,24 +178,24 @@ postulate
   rewrite (*-+-dist b (a * b) c)
   = cong (b * c +_) (*-assoc a b c)
 
-_++_ : {i : Level} {A : UU i}
-  → List A → List A → List A
+_++_ :
+  List A → List A → List A
 [] ++ bs = bs
 (x ∷ as) ++ bs = x ∷ (as ++ bs)
 
-++-left-id : {i : Level} {A : UU i}
-  → (l : List A)
+++-left-id :
+  (l : List A)
   → [] ++ l ≡ l
 ++-left-id l = refl
 
-++-right-id : {i : Level} {A : UU i}
-  → (l : List A)
+++-right-id :
+  (l : List A)
   → l ++ [] ≡ l
 ++-right-id []      = refl
 ++-right-id (x ∷ l) = cong (x ∷_) (++-right-id l)
 
-++-assoc : {i : Level} {A : UU i}
-  → (xs ys zs : List A)
+++-assoc :
+  (xs ys zs : List A)
   → (xs ++ ys) ++ zs ≡ xs ++ (ys ++ zs)
 ++-assoc []       ys zs = refl
 ++-assoc (x ∷ xs) ys zs = cong (x ∷_) (++-assoc xs ys zs)

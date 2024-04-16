@@ -20,15 +20,18 @@ record Category {i} {j} : UU (lsuc (i ⊔ j)) where
       → (f ∘ g) ∘ h ≡ f ∘ (g ∘ h)
 open Category public
 
+_⇒_ : {i j : Level} (A : UU i) (B : UU j) → UU (i ⊔ j)
+A ⇒ B = A → B
+
 SET : {i : Level} → Category {lsuc i} {i}
 SET {i} = record
        { obj = UU i
-       ; hom = λ A B → (A → B)
-       ; id = λ A → A
-       ; _∘_ = λ f g a → f (g a)
-       ; left-id = λ f → refl
-       ; right-id = λ f → refl
-       ; assoc = λ f g h → refl
+       ; hom = _⇒_
+       ; id = →-refl
+       ; _∘_ = →-trans
+       ; left-id = →-left-id
+       ; right-id = →-right-id
+       ; assoc = →-assoc
        }
 
 ℕ-≤-preorder : Category
