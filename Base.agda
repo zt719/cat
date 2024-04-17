@@ -3,8 +3,9 @@ module Base where
 open import Agda.Primitive
   using (Level; lzero; lsuc; _⊔_)
   renaming (Set to UU) public
+
 open import Relation.Binary.PropositionalEquality
-  using (_≡_; refl; cong; cong₂) public
+  using (_≡_; refl; cong) public
 open import Data.Product
   using (_×_; _,_) public
 open import Data.Sum
@@ -15,11 +16,19 @@ open import Data.Unit public
   renaming (⊤ to 𝟙; tt to ＊)
 open import Data.Empty public
   renaming (⊥ to 𝟘)
+open import Agda.Builtin.Maybe
+  using (Maybe; nothing; just) public
 open import Data.List public
   using (List; []; _∷_)
 
 private variable i j : Level
 private variable A : UU i
+private variable B : UU j
+
+-- Extensionality --
+postulate
+  ext : {A : UU i} {B : UU j} {f g : A → B}
+      → ((x : A) → f x ≡ g x) → f ≡ g
 
 ≡-refl : {x : A}
   → x ≡ x
@@ -117,7 +126,6 @@ transitive : {A : UU i}
   → UU (i ⊔ j)
 transitive R = {x y z : _} → R y z → R x y → R x z
 
-{-
 postulate
   R-left-id : {x y : A}
     → (R : A → A → UU j)
@@ -140,7 +148,6 @@ postulate
     → (h : R a b)
     → (t : transitive R)
     → t (t f g) h ≡ t f (t g h)
--}
 
 +-left-id : (a : ℕ)
   → (zero + a) ≡ a

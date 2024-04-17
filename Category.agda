@@ -1,24 +1,23 @@
+
 module Category where
 
 open import Base public
 
 record Category {i} {j} : UU (lsuc (i ⊔ j)) where
-  field
-  
+  field  
     -- Components --
     obj : UU i
     hom : obj → obj → UU j
     id  : {A : obj} → hom A A
     _∘_ : {A B C : obj}
       → hom B C → hom A B → hom A C
-      
     -- Category Laws -- 
     left-id  : {A B : obj} → (f : hom A B) → id ∘ f ≡ f
     right-id : {A B : obj} → (f : hom A B) → f ∘ id ≡ f
     assoc    : {A B C D : obj}
       → (f : hom C D) (g : hom B C) (h : hom A B)
       → (f ∘ g) ∘ h ≡ f ∘ (g ∘ h)
-open Category public
+open Category
 
 SET : Category 
 SET = record

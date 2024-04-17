@@ -7,9 +7,12 @@ private variable i j k l : Level
 
 record Monoid {i} : UU (lsuc i) where
   field
+    -- Components --
     obj      : UU i
     ε        : obj 
     _⊕_      : obj → obj → obj
+
+    -- Monoidal Laws --
     left-id  : (x : obj) → ε ⊕ x ≡ x
     right-id : (x : obj) → x ⊕ ε ≡ x
     assoc    : (x y z : obj) → (x ⊕ y) ⊕ z ≡ x ⊕ (y ⊕ z)
