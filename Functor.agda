@@ -1,6 +1,7 @@
 module Functor where
 
 open import Category
+open import Monoid
 
 private variable i j k l : Level
 
@@ -17,13 +18,16 @@ record Functor (𝓒 : Category {i} {j} ) (𝓓 : Category {k} {l}) : UU (i ⊔ 
       → map-morph ((_∘_) 𝓒 f g) ≡ (_∘_) 𝓓 (map-morph f) (map-morph g)
 open Functor
 
+Endofunctor : (𝓒 : Category {i} {j}) → UU (i ⊔ j)
+Endofunctor 𝓒 = Functor 𝓒 𝓒
+
 Maybe-map-morph : {A : UU i} {B : UU j}
   → (A → B) → Maybe A → Maybe B
 Maybe-map-morph f (just x) = just (f x)
 Maybe-map-morph f nothing  = nothing
 
-Maybe-is-Functor : Functor SET SET
-Maybe-is-Functor
+Maybe-as-Functor : Endofunctor SET
+Maybe-as-Functor
   = record
      { map-obj = Maybe
      ; map-morph = Maybe-map-morph
@@ -49,11 +53,19 @@ List-F-comp' : {A : UU i} {B : UU j} {C : UU j}
 List-F-comp' f g [] = refl
 List-F-comp' f g (a ∷ as) = cong (→-trans f g a ∷_) (List-F-comp' f g as)
 
-List-is-Functor : Functor SET SET
-List-is-Functor
+List-as-Functor : Endofunctor SET
+List-as-Functor
   = record
   { map-obj = List
   ; map-morph = List-map-morph
   ; F-id = ext List-F-id'
   ; F-comp = λ f g → ext (List-F-comp' f g)
+  }
+
+Forgetful-Functor : Functor MON SET
+Forgetful-Functor = record
+  { map-obj = Monoid.obj
+  ; map-morph = _-m→_.map-obj
+  ; F-id = refl
+  ; F-comp = λ f g → refl
   }

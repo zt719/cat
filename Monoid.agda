@@ -18,52 +18,48 @@ record Monoid {i} : UU (lsuc i) where
     assoc    : (x y z : obj) → (x ⊕ y) ⊕ z ≡ x ⊕ (y ⊕ z)
 open Monoid
 
-record MM (M : Monoid {i}) (N : Monoid {j}) : UU (i ⊔ j) where
+-- Homomorphism between Monoids --
+record _-m→_ (M : Monoid {i}) (N : Monoid {j}) : UU (i ⊔ j) where
   field
     map-obj : obj M → obj N 
-    preserve-comp : {A B : obj M}
+    M-comp : {A B : obj M}
       → map-obj ((_⊕_) M A B) ≡ (_⊕_) N (map-obj A) (map-obj B)
 
-MM-refl : {M : Monoid {i}} → MM M M
-MM-refl = record { map-obj = →-refl ; preserve-comp = ≡-refl }
+-m→-refl : {M : Monoid {i}} → M -m→ M
+-m→-refl = record { map-obj = →-refl ; M-comp = ≡-refl }
 
-MM-trans : {M : Monoid {i}} {N : Monoid {j}} {P : Monoid {k}}
-  → MM N P → MM M N → MM M P
-MM-trans
-  record { map-obj = map-obj-NP ; preserve-comp = preserve-comp-NP }
-  record { map-obj = map-obj-MN ; preserve-comp = preserve-comp-MN }
+-m→-trans : {M : Monoid {i}} {N : Monoid {j}} {P : Monoid {k}}
+  → N -m→ P → M -m→ N → M -m→ P
+-m→-trans
+  record { map-obj = map-obj-NP ; M-comp = M-comp-NP }
+  record { map-obj = map-obj-MN ; M-comp = M-comp-MN }
   = record
     { map-obj = →-trans map-obj-NP map-obj-MN
-    ; preserve-comp = ≡-trans preserve-comp-NP (cong map-obj-NP preserve-comp-MN)
+    ; M-comp = ≡-trans M-comp-NP (cong map-obj-NP M-comp-MN)
     }
 
-MM-left-id : {M : Monoid {i}} {N : Monoid {j}}
-  → (mm : MM M N)
-  → MM-trans MM-refl mm ≡ mm
-MM-left-id record { map-obj = map-obj ; preserve-comp = preserve-comp }
-  = {!!}
+postulate
+  -m→-left-id : {M : Monoid {i}} {N : Monoid {j}}
+    → (mm : M -m→ N)
+    → -m→-trans -m→-refl mm ≡ mm
 
-MM-right-id : {M : Monoid {i}} {N : Monoid {j}}
-  → (mm : MM M N)
-  → MM-trans mm MM-refl ≡ mm
-MM-right-id record { map-obj = map-obj ; preserve-comp = preserve-comp }
-  = {!!}
+  -m→-right-id : {M : Monoid {i}} {N : Monoid {j}}
+    → (mm : M -m→ N)
+    → -m→-trans mm -m→-refl ≡ mm
 
-MM-assoc : {M : Monoid {i}} {N : Monoid {j}} {P : Monoid {k}} {Q : Monoid {l}}
-  → (pq : MM P Q) → (np : MM N P) → (mn : MM M N)
-  → MM-trans (MM-trans pq np) mn ≡ MM-trans pq (MM-trans np mn)
-MM-assoc pq np mn
-  = {!!}
+  -m→-assoc : {M : Monoid {i}} {N : Monoid {j}} {P : Monoid {k}} {Q : Monoid {l}}
+    → (pq : P -m→ Q) → (np : N -m→ P) → (mn : M -m→ N)
+    → -m→-trans (-m→-trans pq np) mn ≡ -m→-trans pq (-m→-trans np mn)
 
-Mon : Category
-Mon = record
-       { obj = Monoid
-       ; hom = MM
-       ; id = MM-refl
-       ; _∘_ = MM-trans
-       ; left-id = MM-left-id
-       ; right-id = MM-right-id
-       ; assoc = MM-assoc
+MON : {i : Level} → Category {lsuc i} {i}
+MON {i = i} = record
+       { obj = Monoid {i}
+       ; hom = _-m→_
+       ; id = -m→-refl
+       ; _∘_ = -m→-trans
+       ; left-id = -m→-left-id
+       ; right-id = -m→-right-id
+       ; assoc = -m→-assoc
        }
       
 ℕ-+-0-monoid : Monoid
@@ -103,7 +99,10 @@ free-monoid A
 monoid-as-category : {i : Level}
   → Monoid {i} → Category {lzero} {i}
 monoid-as-category
-  record { obj = obj ; ε = ε ; _⊕_ = _⊕_ ; left-id = left-id ; right-id = right-id ; assoc = assoc }
+  record
+    { obj = obj ; ε = ε ; _⊕_ = _⊕_
+    ; left-id = left-id ; right-id = right-id ; assoc = assoc
+    }
   = record
      { obj = 𝟙
      ; hom = λ _ _ → obj

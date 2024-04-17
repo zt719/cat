@@ -1,25 +1,14 @@
 module Base where
 
-open import Agda.Primitive
-  using (Level; lzero; lsuc; _⊔_)
-  renaming (Set to UU) public
-
-open import Relation.Binary.PropositionalEquality
-  using (_≡_; refl; cong) public
-open import Data.Product
-  using (_×_; _,_) public
-open import Data.Sum
-  renaming (_⊎_ to _∔_; inj₁ to inl; inj₂ to inr) public
-open import Data.Nat public
-  using (ℕ; zero; suc; _≤_; z≤n; s≤s; _+_; _*_)
-open import Data.Unit public 
+open import Agda.Primitive public
+  renaming (Set to UU)
+open import Agda.Builtin.Equality public
+open import Agda.Builtin.Nat public
+  renaming (Nat to ℕ)
+open import Agda.Builtin.List public
+open import Agda.Builtin.Maybe public
+open import Agda.Builtin.Unit public
   renaming (⊤ to 𝟙; tt to ＊)
-open import Data.Empty public
-  renaming (⊥ to 𝟘)
-open import Agda.Builtin.Maybe
-  using (Maybe; nothing; just) public
-open import Data.List public
-  using (List; []; _∷_)
 
 private variable i j : Level
 private variable A : UU i
@@ -27,8 +16,22 @@ private variable B : UU j
 
 -- Extensionality --
 postulate
-  ext : {A : UU i} {B : UU j} {f g : A → B}
-      → ((x : A) → f x ≡ g x) → f ≡ g
+  ext : {f g : A → B}
+    → ((x : A) → f x ≡ g x) → f ≡ g
+
+cong : (f : A → B) {x y : A}
+  → x ≡ y
+    ---------
+  → f x ≡ f y
+cong f refl  =  refl
+
+infix  4 _≤_
+data _≤_ : ℕ → ℕ → UU where
+  z≤n : {n : ℕ}
+    → zero  ≤ n
+  s≤s : {m n : ℕ}
+    → m ≤ n
+    → suc m ≤ suc n
 
 ≡-refl : {x : A}
   → x ≡ x
@@ -56,6 +59,7 @@ postulate
   → (p : z ≡ h) → (q : y ≡ z) → (r : x ≡ y)
   → ≡-trans (≡-trans p q) r ≡ ≡-trans p (≡-trans q r)
 ≡-assoc refl refl refl = refl
+
 
 →-refl : A → A
 →-refl a = a
