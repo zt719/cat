@@ -13,20 +13,24 @@ record Monoid {i} : UU (lsuc i) where
     _⊕_      : obj → obj → obj
 
     -- Monoidal Laws --
-    left-id  : (x : obj) → ε ⊕ x ≡ x
-    right-id : (x : obj) → x ⊕ ε ≡ x
-    assoc    : (x y z : obj) → (x ⊕ y) ⊕ z ≡ x ⊕ (y ⊕ z)
+    mon-left-id  : (a : obj) → ε ⊕ a ≡ a
+    mon-right-id : (a : obj) → a ⊕ ε ≡ a
+    mon-assoc    : (a b c : obj) → (a ⊕ b) ⊕ c ≡ a ⊕ (b ⊕ c)
 open Monoid
 
 -- Homomorphism between Monoids --
 record _-m→_ (M : Monoid {i}) (N : Monoid {j}) : UU (i ⊔ j) where
   field
     map-obj : obj M → obj N 
-    M-comp : {A B : obj M}
-      → map-obj ((_⊕_) M A B) ≡ (_⊕_) N (map-obj A) (map-obj B)
+    M-comp  : {a b : obj M}
+      → map-obj ((_⊕_) M a b) ≡ (_⊕_) N (map-obj a) (map-obj b)
 
 -m→-refl : {M : Monoid {i}} → M -m→ M
--m→-refl = record { map-obj = →-refl ; M-comp = ≡-refl }
+-m→-refl
+  = record
+  { map-obj = →-refl
+  ; M-comp = ≡-refl
+  }
 
 -m→-trans : {M : Monoid {i}} {N : Monoid {j}} {P : Monoid {k}}
   → N -m→ P → M -m→ N → M -m→ P
@@ -52,63 +56,64 @@ postulate
     → -m→-trans (-m→-trans pq np) mn ≡ -m→-trans pq (-m→-trans np mn)
 
 MON : {i : Level} → Category {lsuc i} {i}
-MON {i = i} = record
-       { obj = Monoid {i}
-       ; hom = _-m→_
-       ; id = -m→-refl
-       ; _∘_ = -m→-trans
-       ; left-id = -m→-left-id
-       ; right-id = -m→-right-id
-       ; assoc = -m→-assoc
-       }
+MON {i = i}
+  = record
+  { obj = Monoid {i}
+  ; hom = _-m→_
+  ; id  = -m→-refl
+  ; _∘_ = -m→-trans
+  ; cat-left-id  = -m→-left-id
+  ; cat-right-id = -m→-right-id
+  ; cat-assoc    = -m→-assoc
+  }
       
 ℕ-+-0-monoid : Monoid
 ℕ-+-0-monoid
   = record
-     { obj = ℕ
-     ; ε = 0
-     ; _⊕_ = _+_
-     ; left-id = +-left-id
-     ; right-id = +-right-id
-     ; assoc = +-assoc
-     }
+  { obj = ℕ
+  ; ε   = 0
+  ; _⊕_ = _+_
+  ; mon-left-id  = +-left-id
+  ; mon-right-id = +-right-id
+  ; mon-assoc    = +-assoc
+  }
 
 ℕ-*-1-monoid : Monoid
 ℕ-*-1-monoid
   = record
-     { obj = ℕ
-     ; ε = 1
-     ; _⊕_ = _*_
-     ; left-id = *-left-id
-     ; right-id = *-right-id
-     ; assoc = *-assoc
-     }
+  { obj = ℕ
+  ; ε   = 1
+  ; _⊕_ = _*_
+  ; mon-left-id  = *-left-id
+  ; mon-right-id = *-right-id
+  ; mon-assoc    = *-assoc
+  }
 
 free-monoid : {i : Level}
   → (A : UU i) → Monoid {i}
 free-monoid A
   = record
-     { obj = List A
-     ; ε = []
-     ; _⊕_ = _++_
-     ; left-id = ++-left-id
-     ; right-id = ++-right-id
-     ; assoc = ++-assoc
-     }
+  { obj = List A
+  ; ε   = []
+  ; _⊕_ = _++_
+  ; mon-left-id  = ++-left-id
+  ; mon-right-id = ++-right-id
+  ; mon-assoc    = ++-assoc
+  }
   
 monoid-as-category : {i : Level}
   → Monoid {i} → Category {lzero} {i}
 monoid-as-category
   record
-    { obj = obj ; ε = ε ; _⊕_ = _⊕_
-    ; left-id = left-id ; right-id = right-id ; assoc = assoc
-    }
+  { obj = obj ; ε = ε ; _⊕_ = _⊕_
+  ; mon-left-id = mon-left-id ; mon-right-id = mon-right-id ; mon-assoc = mon-assoc
+  }
   = record
-     { obj = 𝟙
-     ; hom = λ _ _ → obj
-     ; id = ε
-     ; _∘_ = _⊕_
-     ; left-id = left-id
-     ; right-id = right-id
-     ; assoc = assoc
-     }
+  { obj = 𝟙
+  ; hom = λ _ _ → obj
+  ; id  = ε
+  ; _∘_ = _⊕_
+  ; cat-left-id  = mon-left-id
+  ; cat-right-id = mon-right-id
+  ; cat-assoc    = mon-assoc
+  }

@@ -17,7 +17,8 @@ private variable B : UU j
 -- Extensionality --
 postulate
   ext : {f g : A → B}
-    → ((x : A) → f x ≡ g x) → f ≡ g
+    → ((x : A) → f x ≡ g x)
+    → f ≡ g
 
 cong : (f : A → B) {x y : A}
   → x ≡ y
