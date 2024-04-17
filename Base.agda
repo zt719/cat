@@ -1,17 +1,17 @@
 module Base where
 
-open import Agda.Primitive public
+open import Agda.Primitive
   using (Level; lzero; lsuc; _⊔_)
-  renaming (Set to UU)
-open import Relation.Binary.PropositionalEquality public
-  using (_≡_; refl; cong; cong₂)
-open import Data.Product public
-  using (_×_; _,_)
-open import Data.Sum public
-  renaming (_⊎_ to _∔_; inj₁ to inl; inj₂ to inr)
+  renaming (Set to UU) public
+open import Relation.Binary.PropositionalEquality
+  using (_≡_; refl; cong; cong₂) public
+open import Data.Product
+  using (_×_; _,_) public
+open import Data.Sum
+  renaming (_⊎_ to _∔_; inj₁ to inl; inj₂ to inr) public
 open import Data.Nat public
   using (ℕ; zero; suc; _≤_; z≤n; s≤s; _+_; _*_)
-open import Data.Unit public
+open import Data.Unit public 
   renaming (⊤ to 𝟙; tt to ＊)
 open import Data.Empty public
   renaming (⊥ to 𝟘)
@@ -117,6 +117,7 @@ transitive : {A : UU i}
   → UU (i ⊔ j)
 transitive R = {x y z : _} → R y z → R x y → R x z
 
+{-
 postulate
   R-left-id : {x y : A}
     → (R : A → A → UU j)
@@ -139,6 +140,7 @@ postulate
     → (h : R a b)
     → (t : transitive R)
     → t (t f g) h ≡ t f (t g h)
+-}
 
 +-left-id : (a : ℕ)
   → (zero + a) ≡ a

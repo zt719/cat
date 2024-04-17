@@ -20,13 +20,10 @@ record Category {i} {j} : UU (lsuc (i ⊔ j)) where
       → (f ∘ g) ∘ h ≡ f ∘ (g ∘ h)
 open Category public
 
-_⇒_ : {i j : Level} (A : UU i) (B : UU j) → UU (i ⊔ j)
-A ⇒ B = A → B
-
-SET : {i : Level} → Category {lsuc i} {i}
-SET {i} = record
-       { obj = UU i
-       ; hom = _⇒_
+SET : Category 
+SET = record
+       { obj = UU
+       ; hom = λ A B → (A → B)
        ; id = →-refl
        ; _∘_ = →-trans
        ; left-id = →-left-id

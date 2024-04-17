@@ -3,7 +3,7 @@ module Monoid where
 open import Base
 open import Category
 
-private variable i j k : Level
+private variable i j k l : Level
 
 record Monoid {i} : UU (lsuc i) where
   field
@@ -22,7 +22,7 @@ record MM (M : Monoid {i}) (N : Monoid {j}) : UU (i ⊔ j) where
       → map-obj ((_⊕_) M A B) ≡ (_⊕_) N (map-obj A) (map-obj B)
 
 MM-refl : {M : Monoid {i}} → MM M M
-MM-refl = record { map-obj = →-refl ; preserve-comp = refl }
+MM-refl = record { map-obj = →-refl ; preserve-comp = ≡-refl }
 
 MM-trans : {M : Monoid {i}} {N : Monoid {j}} {P : Monoid {k}}
   → MM N P → MM M N → MM M P
@@ -34,17 +34,35 @@ MM-trans
     ; preserve-comp = ≡-trans preserve-comp-NP (cong map-obj-NP preserve-comp-MN)
     }
 
+MM-left-id : {M : Monoid {i}} {N : Monoid {j}}
+  → (mm : MM M N)
+  → MM-trans MM-refl mm ≡ mm
+MM-left-id record { map-obj = map-obj ; preserve-comp = preserve-comp }
+  = {!!}
+
+MM-right-id : {M : Monoid {i}} {N : Monoid {j}}
+  → (mm : MM M N)
+  → MM-trans mm MM-refl ≡ mm
+MM-right-id record { map-obj = map-obj ; preserve-comp = preserve-comp }
+  = {!!}
+
+MM-assoc : {M : Monoid {i}} {N : Monoid {j}} {P : Monoid {k}} {Q : Monoid {l}}
+  → (pq : MM P Q) → (np : MM N P) → (mn : MM M N)
+  → MM-trans (MM-trans pq np) mn ≡ MM-trans pq (MM-trans np mn)
+MM-assoc pq np mn
+  = {!!}
+
 Mon : Category
 Mon = record
        { obj = Monoid
        ; hom = MM
        ; id = MM-refl
        ; _∘_ = MM-trans
-       ; left-id = {!!}
-       ; right-id = {!!}
-       ; assoc = {!!}
+       ; left-id = MM-left-id
+       ; right-id = MM-right-id
+       ; assoc = MM-assoc
        }
-
+      
 ℕ-+-0-monoid : Monoid
 ℕ-+-0-monoid
   = record
