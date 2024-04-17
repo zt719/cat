@@ -10,12 +10,12 @@ record Category {i} {j} : UU (lsuc (i ⊔ j)) where
     hom : obj → obj → UU j
     id  : {a : obj} → hom a a
     _∘_ : {a b c : obj}
-      → hom b c → hom a b → hom a c
+      → hom a b → hom b c → hom a c
     -- Category Laws -- 
     cat-left-id  : {a b : obj} → (f : hom a b) → id ∘ f ≡ f
     cat-right-id : {a b : obj} → (f : hom a b) → f ∘ id ≡ f
     cat-assoc    : {a b c d : obj}
-      → (f : hom c d) (g : hom b c) (h : hom a b)
+      → (f : hom a b) (g : hom b c) (h : hom c d)
       → (f ∘ g) ∘ h ≡ f ∘ (g ∘ h)
 open Category
 

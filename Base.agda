@@ -43,49 +43,53 @@ data _≤_ : ℕ → ℕ → UU where
 ≡-sym refl = refl
 
 ≡-trans : {x y z : A}
-  → y ≡ z → x ≡ y → x ≡ z
+  → x ≡ y → y ≡ z → x ≡ z
 ≡-trans refl refl = refl
+
+infixl 5 _≡∘_
+_≡∘_ = ≡-trans
 
 ≡-left-id : {x y : A}
   → (p : x ≡ y)
-  → ≡-trans ≡-refl p ≡ p
+  → ≡-refl ≡∘ p ≡ p
 ≡-left-id refl = refl
 
 ≡-right-id : {x y : A}
   → (p : x ≡ y)
-  → ≡-trans p ≡-refl ≡ p
+  → p ≡∘ ≡-refl ≡ p
 ≡-right-id refl = refl
 
 ≡-assoc : {x y z h : A}
-  → (p : z ≡ h) → (q : y ≡ z) → (r : x ≡ y)
-  → ≡-trans (≡-trans p q) r ≡ ≡-trans p (≡-trans q r)
+  → (p : x ≡ y) → (q : y ≡ z) → (r : z ≡ h)
+  → (p ≡∘ q) ≡∘ r ≡ p ≡∘ (q ≡∘ r)
 ≡-assoc refl refl refl = refl
-
 
 →-refl : A → A
 →-refl a = a
 
 →-trans : {i j k : Level} {A : UU i} {B : UU j} {C : UU k}
-  → (B → C) → (A → B) → (A → C)
-→-trans f g x = f (g x)
+  → (A → B) → (B → C) → (A → C)
+→-trans f g x = g (f x)
+
+_→∘_ = →-trans
 
 →-left-id : {i j : Level} {A : UU i} {B : UU j}
   (f : A → B)
-  → →-trans →-refl f ≡ f
+  → →-refl →∘ f ≡ f
 →-left-id f = refl
 
 →-right-id : {i j : Level} {A : UU i} {B : UU j}
   (f : A → B)
-  → →-trans f →-refl ≡ f
+  → f →∘ →-refl ≡ f
 →-right-id f = refl
 
 →-assoc : {i j k l : Level}
   {A : UU i} {B : UU j}
   {C : UU k} {D : UU l}
-  → (f : C → D)
+  → (f : A → B)
   → (g : B → C)
-  → (h : A → B)
-  → →-trans (→-trans f g) h ≡ →-trans f (→-trans g h)
+  → (h : C → D)
+  → (f →∘ g) →∘ h ≡ f →∘ (g →∘ h)
 →-assoc f g h = refl
 
 ≤-refl : {a : ℕ}
@@ -94,26 +98,28 @@ data _≤_ : ℕ → ℕ → UU where
 ≤-refl {suc a} = s≤s ≤-refl
 
 ≤-trans : {a b c : ℕ}
-  → b ≤ c → a ≤ b → a ≤ c
-≤-trans _         z≤n       = z≤n
-≤-trans (s≤s b≤c) (s≤s a≤b) = s≤s (≤-trans b≤c a≤b)
+  → a ≤ b → b ≤ c → a ≤ c
+≤-trans z≤n       _         = z≤n
+≤-trans (s≤s a≤b) (s≤s b≤c) = s≤s (≤-trans a≤b b≤c)
+
+_≤∘_ = ≤-trans
 
 ≤-left-id : {a b : ℕ}
   → (f : a ≤ b)
-  → ≤-trans ≤-refl f ≡ f
+  → ≤-refl ≤∘ f ≡ f
 ≤-left-id z≤n = refl
 ≤-left-id (s≤s f) = cong s≤s (≤-left-id f)
 
 ≤-right-id : {a b : ℕ}
   → (f : a ≤ b)
-  → ≤-trans f ≤-refl ≡ f
+  → f ≤∘ ≤-refl ≡ f
 ≤-right-id z≤n = refl
 ≤-right-id (s≤s f) = cong s≤s (≤-right-id f)
 
 ≤-assoc : {a b c d : ℕ}
-  → (f : c ≤ d) (g : b ≤ c) (h : a ≤ b)
-  → ≤-trans (≤-trans f g) h ≡ ≤-trans f (≤-trans g h)
-≤-assoc _ _ z≤n = refl
+  → (f : a ≤ b) (g : b ≤ c) (h : c ≤ d)
+  → (f ≤∘ g) ≤∘ h ≡ f ≤∘ (g ≤∘ h)
+≤-assoc z≤n     _       _       = refl
 ≤-assoc (s≤s f) (s≤s g) (s≤s h) = cong s≤s (≤-assoc f g h)
 
 reflexive : {A : UU i}
@@ -129,7 +135,7 @@ symmetric R = {x y : _} → R x y → R y x
 transitive : {A : UU i}
   → (R : A → A → UU j)
   → UU (i ⊔ j)
-transitive R = {x y z : _} → R y z → R x y → R x z
+transitive R = {x y z : _} → R x y → R y z → R x z
 
 postulate
   R-left-id : {x y : A}
@@ -148,9 +154,9 @@ postulate
 
   R-assoc : {a b c d : A}
     → (R : A → A → UU j)
-    → (f : R c d)
+    → (f : R a b)
     → (g : R b c)
-    → (h : R a b)
+    → (h : R c d)
     → (t : transitive R)
     → t (t f g) h ≡ t f (t g h)
 

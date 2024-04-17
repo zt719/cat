@@ -13,7 +13,7 @@ record NT {𝓒 : Category {i} {j}} {𝓓 : Category {k} {l}}
   field
     α : {A : obj 𝓒} → hom 𝓓 (map F A) (map G A)
     NTL : {A B : obj 𝓒} {f : hom 𝓒 A B}
-      → (_∘_) 𝓓 (α {B}) (fmap F f) ≡ (_∘_) 𝓓 (fmap G f) (α {A})
+      → (_∘_) 𝓓 (fmap F f) (α {B}) ≡ (_∘_) 𝓓 (α {A}) (fmap G f)
 open NT
 
 head : {A : UU i}
@@ -29,32 +29,24 @@ head-is-NT = record
 
 NT-trans : {𝓒 : Category {i} {j}} {𝓓 : Category {k} {l}}
   → {F G H : Functor 𝓒 𝓓}
-  → NT G H → NT F G → NT F H
+  → NT F G → NT G H → NT F H
 open Category.Category
 open Functor.Functor
 NT-trans
-  {𝓓 = record { obj = obj ; hom = hom ; id = id ; _∘_ = _∘_ ; cat-left-id = cat-left-id ; cat-right-id = cat-right-id ; cat-assoc = cat-assoc }}
+  {𝓓 = record { _∘_ = _∘_ ; cat-assoc = cat-assoc }}
   {F = F} {G = G} {H = H}
-  record { α = α-GH ; NTL = NTL-GH }
   record { α = α-FG ; NTL = NTL-FG }
+  record { α = α-GH ; NTL = NTL-GH }
   = record
-  { α = α-GH ∘ α-FG
+  { α = α-FG ∘ α-GH
   ; NTL = λ{ {f = f} →
-    ≡-trans
-      (cat-assoc (fmap H f) α-GH α-FG)
-      (≡-trans
-        (cong (_∘ α-FG) NTL-GH)
-        (≡-trans
-          (≡-sym (cat-assoc α-GH (fmap G f) α-FG))
-          (≡-trans
-            (cong (α-GH ∘_) NTL-FG)
-            (cat-assoc α-GH α-FG (fmap F f))
-          )
-        )
-      )
-          }
+    ≡-sym (cat-assoc (fmap F f) α-FG α-GH)
+    ≡∘ cong (_∘ α-GH) NTL-FG
+    ≡∘ cat-assoc α-FG (fmap G f) α-GH
+    ≡∘ (cong (α-FG ∘_) NTL-GH)
+    ≡∘ ≡-sym (cat-assoc α-FG α-GH (fmap H f))}
   }
 
 -- NT-horizontal : {𝓒 : Category {i} {j}} {𝓓 : Category {k} {l}} {𝓔 : Category {m} {n}}
---   → {F G : Functor 𝓒 𝓓} {H J : Functor 𝓓 𝓔}
+--  → {F G : Functor 𝓒 𝓓} {H J : Functor 𝓓 𝓔}
 --  → 

@@ -15,7 +15,7 @@ record Functor (𝓒 : Category {i} {j} ) (𝓓 : Category {k} {l}) : UU (i ⊔ 
 
     -- Functor Laws --
     func-id-law   : {a : obj 𝓒} → fmap (id 𝓒 {a}) ≡ id 𝓓 {map a}
-    func-comp-law : {a b c : obj 𝓒} {f : hom 𝓒 b c} {g : hom 𝓒 a b}
+    func-comp-law : {a b c : obj 𝓒} {f : hom 𝓒 a b} {g : hom 𝓒 b c}
       → fmap ((_∘_) 𝓒 f g) ≡ (_∘_) 𝓓 (fmap f) (fmap g)
 open Functor
 
@@ -34,18 +34,17 @@ func-refl
 
 func-trans : 
   {𝓒 : Category {i} {j}} {𝓓 : Category {k} {l}} {𝓔 : Category {m} {n}}
-  → (F : Functor 𝓓 𝓔) (G : Functor 𝓒 𝓓)
-  → Functor 𝓒 𝓔
+  → Functor 𝓒 𝓓 → Functor 𝓓 𝓔 → Functor 𝓒 𝓔
+open Category.Category
 func-trans
   record { map = map-F ; fmap = fmap-F ; func-id-law = func-id-law-F ; func-comp-law = func-comp-law-F }
   record { map = map-G ; fmap = fmap-G ; func-id-law = func-id-law-G ; func-comp-law = func-comp-law-G }
   = record
-  { map  = →-trans map-F map-G
-  ; fmap = →-trans fmap-F fmap-G
-  ; func-id-law   = ≡-trans func-id-law-F (cong fmap-F func-id-law-G)
-  ; func-comp-law = ≡-trans func-comp-law-F (cong fmap-F func-comp-law-G)
+  { map  = map-F →∘ map-G
+  ; fmap = fmap-F →∘ fmap-G
+  ; func-id-law   = (cong fmap-G func-id-law-F) ≡∘ func-id-law-G 
+  ; func-comp-law = (cong fmap-G func-comp-law-F) ≡∘ func-comp-law-G
   }
-
 
 maybe-functor : Endofunctor SET
 maybe-functor
@@ -81,7 +80,7 @@ list-functor
   list-func-id-law' (x ∷ as) = cong (→-refl x ∷_) (list-func-id-law' as)
   
   list-func-comp-law' : {A : UU i} {B : UU j} {C : UU j}
-    → {f : B → C} {g : A → B}
+    → {f : A → B} {g : B → C}
     → (as : List A)
     → list-fmap (→-trans f g) as ≡ →-trans (list-fmap f) (list-fmap g) as
   list-func-comp-law' [] = refl

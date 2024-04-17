@@ -33,14 +33,16 @@ record _-m→_ (M : Monoid {i}) (N : Monoid {j}) : UU (i ⊔ j) where
   }
 
 -m→-trans : {M : Monoid {i}} {N : Monoid {j}} {P : Monoid {k}}
-  → N -m→ P → M -m→ N → M -m→ P
+  → M -m→ N → N -m→ P → M -m→ P
 -m→-trans
-  record { map-obj = map-obj-NP ; M-comp = M-comp-NP }
   record { map-obj = map-obj-MN ; M-comp = M-comp-MN }
+  record { map-obj = map-obj-NP ; M-comp = M-comp-NP }
   = record
-    { map-obj = →-trans map-obj-NP map-obj-MN
-    ; M-comp = ≡-trans M-comp-NP (cong map-obj-NP M-comp-MN)
+    { map-obj = map-obj-MN →∘ map-obj-NP
+    ; M-comp = (cong map-obj-NP M-comp-MN) ≡∘ M-comp-NP
     }
+
+_-m→∘_ = -m→-trans
 
 postulate
   -m→-left-id : {M : Monoid {i}} {N : Monoid {j}}
@@ -52,8 +54,8 @@ postulate
     → -m→-trans mm -m→-refl ≡ mm
 
   -m→-assoc : {M : Monoid {i}} {N : Monoid {j}} {P : Monoid {k}} {Q : Monoid {l}}
-    → (pq : P -m→ Q) → (np : N -m→ P) → (mn : M -m→ N)
-    → -m→-trans (-m→-trans pq np) mn ≡ -m→-trans pq (-m→-trans np mn)
+    → (pq : M -m→ N) → (np : N -m→ P) → (mn : P -m→ Q)
+    → (pq -m→∘ np) -m→∘ mn ≡ pq -m→∘ (np -m→∘ mn)
 
 MON : {i : Level} → Category {lsuc i} {i}
 MON {i = i}
