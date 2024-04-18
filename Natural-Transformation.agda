@@ -100,7 +100,7 @@ nt-func-horizontal : {G G' : Functor 𝓓 𝓔}
   → NT (G ⇐∘ F) (G' ⇐∘ F)
 nt-func-horizontal β F = β <~∘h identity-nt F
 
-_<~∘F_ = nt-func-horizontal
+_<~∘⇐_ = nt-func-horizontal
 
 func-nt-horizontal : {F F' : Functor 𝓒 𝓓}
   → (G : Functor 𝓓 𝓔)
@@ -108,4 +108,4 @@ func-nt-horizontal : {F F' : Functor 𝓒 𝓓}
   → NT (G ⇐∘ F) (G ⇐∘ F')
 func-nt-horizontal G α = identity-nt G <~∘h α
 
-_F∘<~_ = func-nt-horizontal
+_⇐∘<~_ = func-nt-horizontal

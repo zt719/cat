@@ -3,7 +3,9 @@ module Functor where
 open import Category
 open import Monoid
 
-private variable i j k l m n : Level
+private variable i j k l m n x y : Level
+private variable 𝓒 : Category {i} {j}
+private variable 𝓓 : Category {k} {l}
 
 record Functor (𝓒 : Category {i} {j} ) (𝓓 : Category {k} {l}) : UU (i ⊔ j ⊔ k ⊔ l) where
   open Category.Category 𝓒
@@ -17,7 +19,7 @@ record Functor (𝓒 : Category {i} {j} ) (𝓓 : Category {k} {l}) : UU (i ⊔ 
     func-id   : {a : obj 𝓒} → fmap (id 𝓒 {a}) ≡ id 𝓓 {map a}
     func-comp : {a b c : obj 𝓒} {f : hom 𝓒 b c} {g : hom 𝓒 a b}
       → fmap ((_∘_) 𝓒 f g) ≡ (_∘_) 𝓓 (fmap f) (fmap g)
-open Functor
+open Functor public
 
 Endofunctor : (𝓒 : Category {i} {j}) → UU (i ⊔ j)
 Endofunctor 𝓒 = Functor 𝓒 𝓒
@@ -34,19 +36,24 @@ func-refl
 
 func-trans : 
   {𝓒 : Category {i} {j}} {𝓓 : Category {k} {l}} {𝓔 : Category {m} {n}}
-  → (F : Functor 𝓓 𝓔) (G : Functor 𝓒 𝓓)
-  → Functor 𝓒 𝓔
+  → Functor 𝓓 𝓔 → Functor 𝓒 𝓓 → Functor 𝓒 𝓔
 func-trans
   record { map = map-F ; fmap = fmap-F ; func-id = func-id-F ; func-comp = func-comp-F }
   record { map = map-G ; fmap = fmap-G ; func-id = func-id-G ; func-comp = func-comp-G }
   = record
   { map  = map-F ←∘ map-G
   ; fmap = fmap-F ←∘ fmap-G
-  ; func-id   = func-id-F ∘≡ (cong fmap-F func-id-G)
-  ; func-comp = func-comp-F ∘≡ (cong fmap-F func-comp-G)
+  ; func-id   = func-id-F ∘≡ cong fmap-F func-id-G
+  ; func-comp = func-comp-F ∘≡ cong fmap-F func-comp-G
   }
 
-_⇐∘_ = func-trans 
+_⇐∘_ = func-trans
+
+postulate
+  func-assoc : 
+    {𝓒 : Category {i} {j}} {𝓓 : Category {k} {l}} {𝓔 : Category {m} {n}} {𝓕 : Category {x} {y}}
+    → (F : Functor 𝓔 𝓕) (G : Functor 𝓓 𝓔) (H : Functor 𝓒 𝓓)
+    → (F ⇐∘ G) ⇐∘ H ≡ F ⇐∘ (G ⇐∘ H)
 
 maybe-functor : Endofunctor SET
 maybe-functor

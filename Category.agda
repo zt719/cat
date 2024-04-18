@@ -17,7 +17,7 @@ record Category {i} {j} : UU (lsuc (i ⊔ j)) where
     cat-assoc    : {a b c d : obj}
       → (f : hom c d) (g : hom b c) (h : hom a b)
       → (f ∘ g) ∘ h ≡ f ∘ (g ∘ h)
-open Category
+open Category public
 
 SET : Category 
 SET

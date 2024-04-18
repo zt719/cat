@@ -11,6 +11,9 @@ record Monad (𝓒 : Category {i} {j}) : UU (i ⊔ j) where
   field
     T : Endofunctor 𝓒
     η : NT (identity-functor 𝓒) T
-    μ : NT (func-trans T T) T
+    μ : NT (T ⇐∘ T) T
+    rule1 : μ <~∘ (μ <~∘⇐ T) ≡ μ <~∘ {!T ⇐∘<~ μ!}
+    rule2 : μ <~∘ (T ⇐∘<~ η) ≡ {!identity-nt T!}
+    rule3 : μ <~∘ (η <~∘⇐ T) ≡ {!identity-nt T!}
 open Monad    
     
