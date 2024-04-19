@@ -52,18 +52,23 @@ _⇐_ = func-trans
 
 postulate
   func-≡ : (F D : Functor 𝓒 𝓓)
-    → (map F ≡ map D)
+    → map F ≡ map D
     → F ≡ D
 
 func-left-id :
     (F : Functor 𝓒 𝓓)
   → func-refl ⇐ F ≡ F
-func-left-id F
-  = func-≡ (func-refl ⇐ F) F refl
+func-left-id F = func-≡ (func-refl ⇐ F) F refl
 
-postulate
-  func-assoc : (F : Functor 𝓔 𝓕) (G : Functor 𝓓 𝓔) (H : Functor 𝓒 𝓓)
-    → (F ⇐ G) ⇐ H ≡ F ⇐ (G ⇐ H)
+func-right-id :
+    (F : Functor 𝓒 𝓓)
+  → F ⇐ func-refl ≡ F
+func-right-id F = func-≡ (F ⇐ func-refl) F refl
+
+func-assoc : (F : Functor 𝓔 𝓕) (G : Functor 𝓓 𝓔) (H : Functor 𝓒 𝓓)
+  → (F ⇐ G) ⇐ H ≡ F ⇐ (G ⇐ H)
+func-assoc F G H = func-≡ ((F ⇐ G) ⇐ H) (F ⇐ (G ⇐ H)) refl
+
 
 maybe-functor : Endofunctor SET
 maybe-functor

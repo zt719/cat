@@ -18,6 +18,11 @@ record Monoid {i} : UU (lsuc i) where
     assoc    : (a b c : obj) → (a ⊕ b) ⊕ c ≡ a ⊕ (b ⊕ c)
 open Monoid
 
+private variable M : Monoid {i}
+private variable N : Monoid {j}
+private variable P : Monoid {k}
+private variable Q : Monoid {l}
+
 -- Homomorphism between Monoids --
 record MH (M : Monoid {i}) (N : Monoid {j}) : UU (i ⊔ j) where
   field
@@ -28,39 +33,46 @@ record MH (M : Monoid {i}) (N : Monoid {j}) : UU (i ⊔ j) where
     map-comp : {a b : obj M} → map ((_⊕_) M a b) ≡ (_⊕_) N (map a) (map b)
 open MH
 
-mh-refl : {M : Monoid {i}} → MH M M
+mh-refl : MH M M
 mh-refl
   = record
   { map  = →-refl
   ; map-comp = ≡-refl
   }
 
-mh-trans : {M : Monoid {i}} {N : Monoid {j}} {P : Monoid {k}}
-  → (f : MH N P) (g : MH M N) → MH M P
+mh-trans : (f : MH N P) (g : MH M N) → MH M P
 mh-trans
   record { map = map-f ; map-comp = map-comp-f }
   record { map = map-g ; map-comp = map-comp-g }
   = record
-    { map  = →-trans map-f map-g
-    ; map-comp = ≡-trans map-comp-f (cong map-f map-comp-g)
+    { map  = map-f ← map-g
+    ; map-comp = map-comp-f ≡∘ cong map-f map-comp-g
     }
 
 _←mh-_ = mh-trans
 
 postulate
-  mh-left-id : {M : Monoid {i}} {N : Monoid {j}}
-    → (f : MH M N)
-    → mh-refl ←mh- f ≡ f
+  mh-≡ :
+      (f g : MH M N)
+    → map f ≡ map g
+    → f ≡ g
 
-  mh-right-id : {M : Monoid {i}} {N : Monoid {j}}
-    → (f : MH M N)
-    → f ←mh- mh-refl ≡ f
+mh-left-id :
+    (f : MH M N)
+  → mh-refl ←mh- f ≡ f
+mh-left-id f = mh-≡ (mh-refl ←mh- f) f refl
 
-  mh-assoc : {M : Monoid {i}} {N : Monoid {j}} {P : Monoid {k}} {Q : Monoid {l}}
-    → (f : MH P Q) (g : MH N P) (h : MH M N)
-    → (f ←mh- g) ←mh- h ≡ f ←mh- (g ←mh- h)
+mh-right-id : 
+    (f : MH M N)
+  → f ←mh- mh-refl ≡ f
+mh-right-id f = mh-≡ (f ←mh- mh-refl) f refl
 
-MON : {i : Level} → Category {lsuc i} {i}
+mh-assoc :
+    (f : MH P Q) (g : MH N P) (h : MH M N)
+  → (f ←mh- g) ←mh- h ≡ f ←mh- (g ←mh- h)
+mh-assoc f g h = mh-≡ ((f ←mh- g) ←mh- h) (f ←mh- (g ←mh- h)) refl
+
+MON : Category {lsuc i} {i}
 MON {i = i}
   = record
   { obj = Monoid {i}
@@ -94,8 +106,7 @@ MON {i = i}
   ; assoc    = *-assoc
   }
 
-free-monoid : {i : Level}
-  → (A : UU i) → Monoid {i}
+free-monoid : (A : UU i) → Monoid {i}
 free-monoid A
   = record
   { obj = List A
@@ -106,8 +117,7 @@ free-monoid A
   ; assoc    = ++-assoc
   }
   
-monoid-as-category : {i : Level}
-  → Monoid {i} → Category {lzero} {i}
+monoid-as-category : Monoid {i} → Category
 monoid-as-category
   record
   { obj = obj ; ε = ε ; _⊕_ = _⊕_
