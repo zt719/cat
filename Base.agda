@@ -48,22 +48,22 @@ data _≤_ : ℕ → ℕ → UU where
   → y ≡ z → x ≡ y → x ≡ z
 ≡-trans refl refl = refl
 
-infixl 5 _∘≡_
-_∘≡_ = ≡-trans
+infixl 5 _≡∘_
+_≡∘_ = ≡-trans
 
 ≡-left-id : {x y : A}
   → (p : x ≡ y)
-  → ≡-refl ∘≡ p ≡ p
+  → ≡-refl ≡∘ p ≡ p
 ≡-left-id refl = refl
 
 ≡-right-id : {x y : A}
   → (p : x ≡ y)
-  → p ∘≡ ≡-refl ≡ p
+  → p ≡∘ ≡-refl ≡ p
 ≡-right-id refl = refl
 
 ≡-assoc : {x y z h : A}
   → (p : z ≡ h) (q : y ≡ z) (r : x ≡ y)
-  → (p ∘≡ q) ∘≡ r ≡ p ∘≡ (q ∘≡ r)
+  → (p ≡∘ q) ≡∘ r ≡ p ≡∘ (q ≡∘ r)
 ≡-assoc refl refl refl = refl
 
 
@@ -73,21 +73,21 @@ _∘≡_ = ≡-trans
 →-trans : (B → C) → (A → B) → (A → C)
 →-trans f g x = f (g x)
 
-_←∘_ = →-trans
+_←_ = →-trans
 
 →-left-id :
     (f : A → B)
-  → →-refl ←∘ f ≡ f
+  → →-refl ← f ≡ f
 →-left-id f = refl
 
 →-right-id :
     (f : A → B)
-  → f ←∘ →-refl ≡ f
+  → f ← →-refl ≡ f
 →-right-id f = refl
 
 →-assoc :
     (f : C → D) (g : B → C) (h : A → B)
-  → (f ←∘ g) ←∘ h ≡ f ←∘ (g ←∘  h)
+  → (f ← g) ← h ≡ f ← (g ← h)
 →-assoc f g h = refl
 
 ≤-refl : {a : ℕ}
@@ -121,61 +121,60 @@ _∘≤_ = ≤-trans
 ≤-assoc (s≤s f) (s≤s g) (s≤s h) = cong s≤s (≤-assoc f g h)
 
 +-left-id : (a : ℕ)
-  → (zero + a) ≡ a
+  → 0 + a ≡ a
 +-left-id a = refl
 
 +-right-id : (a : ℕ)
-  → (a + zero) ≡ a
+  → a + 0 ≡ a
 +-right-id zero    = refl
 +-right-id (suc a) = cong suc (+-right-id a)
 
 +-assoc : (a b c : ℕ)
-  → ((a + b) + c) ≡ (a + (b + c))
+  → (a + b) + c ≡ a + (b + c)
 +-assoc zero    b c = refl
 +-assoc (suc a) b c = cong suc (+-assoc a b c)
 
 *-left-id : (a : ℕ)
-  → (1 * a) ≡ a
+  → 1 * a ≡ a
 *-left-id zero    = refl
 *-left-id (suc a) = cong suc (*-left-id a)
 
 *-right-id : (a : ℕ)
-  → (a * 1) ≡ a
+  → a * 1 ≡ a
 *-right-id zero    = refl
 *-right-id (suc a) = cong suc (*-right-id a)
 
-*-+-dist : (a b c : ℕ)
+*-+-dist :
+    (a b c : ℕ)
   → (a + b) * c ≡ a * c + b * c
 *-+-dist zero    b c = refl
-*-+-dist (suc a) b c
-  rewrite (+-assoc c (a * c) (b * c))
-  = cong (c +_) (*-+-dist a b c)
+*-+-dist (suc a) b c = ≡-sym (+-assoc c (a * c) (b * c))
+  ≡∘ cong (c +_) (*-+-dist a b c)
 
-*-assoc : (a b c : ℕ)
-  → ((a * b) * c) ≡ (a * (b * c))
+*-assoc :
+    (a b c : ℕ)
+  → (a * b) * c ≡ a * (b * c)
 *-assoc zero    b c = refl
-*-assoc (suc a) b c
-  rewrite (*-+-dist b (a * b) c)
-  = cong (b * c +_) (*-assoc a b c)
+*-assoc (suc a) b c = cong (b * c +_) (*-assoc a b c)
+  ≡∘ *-+-dist b (a * b) c
 
-_++_ :
-  List A → List A → List A
+_++_ : List A → List A → List A
 [] ++ bs = bs
 (x ∷ as) ++ bs = x ∷ (as ++ bs)
 
 ++-left-id :
-  (l : List A)
+    (l : List A)
   → [] ++ l ≡ l
 ++-left-id l = refl
 
 ++-right-id :
-  (l : List A)
+    (l : List A)
   → l ++ [] ≡ l
 ++-right-id []      = refl
 ++-right-id (x ∷ l) = cong (x ∷_) (++-right-id l)
 
 ++-assoc :
-  (xs ys zs : List A)
+    (xs ys zs : List A)
   → (xs ++ ys) ++ zs ≡ xs ++ (ys ++ zs)
 ++-assoc []       ys zs = refl
 ++-assoc (x ∷ xs) ys zs = cong (x ∷_) (++-assoc xs ys zs)

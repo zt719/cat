@@ -35,14 +35,14 @@ nt-refl : {F : Functor 𝓒 𝓓}
 open Category.Category
 open Functor.Functor
 nt-refl
-  {𝓒 = record { id = id ; cat-left-id = left-id ; cat-right-id = right-id }}
-  {F = record { fmap = fmap ; func-comp = func-comp }}
+  {𝓒 = record { id = id ; left-id = left-id ; right-id = right-id }}
+  {F = record { fmap = fmap ; map-comp = map-comp }}
   = record
   { α = λ a → fmap (id {a})
   ; ntl = λ
-    { {f = f} → func-comp
-    ∘≡ cong fmap (≡-sym (right-id f) ∘≡ left-id f)
-    ∘≡ ≡-sym func-comp
+    { {f = f} → map-comp
+    ≡∘ cong fmap (≡-sym (right-id f) ≡∘ left-id f)
+    ≡∘ ≡-sym map-comp
     }
   }
 
@@ -55,7 +55,7 @@ nt-trans : {F G H : Functor 𝓒 𝓓}
 open Category.Category
 open Functor.Functor
 nt-trans
-  {𝓓 = record { _∘_ = _∘_ ; cat-assoc = assoc }}
+  {𝓓 = record { _∘_ = _∘_ ; assoc = assoc }}
   {F = F} {G = G} {H = H}
   record { α = α ; ntl = ntl-α }
   record { α = β ; ntl = ntl-β }
@@ -63,32 +63,32 @@ nt-trans
   { α = λ a → (α a) ∘ (β a)
   ; ntl = λ
     { {a} {b} {f} → assoc (fmap H f) (α a) (β a)
-    ∘≡ cong (_∘ (β a)) ntl-α
-    ∘≡ ≡-sym (assoc (α b) (fmap G f) (β a))
-    ∘≡ cong ((α b) ∘_) ntl-β
-    ∘≡ assoc (α b) (β b) (fmap F f)
+    ≡∘ cong (_∘ (β a)) ntl-α
+    ≡∘ ≡-sym (assoc (α b) (fmap G f) (β a))
+    ≡∘ cong ((α b) ∘_) ntl-β
+    ≡∘ assoc (α b) (β b) (fmap F f)
     }
   }
 
 _<~∘_ = nt-trans
 
 nt-horizontal : {F F' : Functor 𝓒 𝓓} {G G' : Functor 𝓓 𝓔}
-  → NT G G' → NT F F' → NT (G ⇐∘ F) (G' ⇐∘ F')
+  → NT G G' → NT F F' → NT (G ⇐ F) (G' ⇐ F')
 open Category.Category
 open Functor.Functor
 nt-horizontal
-  {𝓔 = record { _∘_ = _∘_ ; cat-assoc = assoc }}
+  {𝓔 = record { _∘_ = _∘_ ; assoc = assoc }}
   {F} {F'} {G} {G'}
   record { α = β ; ntl = ntl-β }
   record { α = α ; ntl = ntl-α }
   = record
   { α = λ a → fmap G' (α a) ∘ β (map F a)
   ; ntl = λ
-    { {a} {b} {f} → assoc (fmap (G' ⇐∘ F') f) (fmap G' (α a)) (β (map F a))
-    ∘≡ cong (_∘ β (map F a)) (func-comp G' ∘≡ cong (fmap G') ntl-α ∘≡ ≡-sym (func-comp G'))
-    ∘≡ ≡-sym (assoc (fmap G' (α b)) (fmap (G' ⇐∘ F) f) (β (map F a)))
-    ∘≡ cong (fmap G' (α b) ∘_) (ntl-β {map F a} {map F b} {fmap F f})
-    ∘≡ assoc (fmap G' (α b)) (β (map F b)) (fmap (G ⇐∘ F) f)
+    { {a} {b} {f} → assoc (fmap (G' ⇐ F') f) (fmap G' (α a)) (β (map F a))
+    ≡∘ cong (_∘ β (map F a)) (map-comp G' ≡∘ cong (fmap G') ntl-α ≡∘ ≡-sym (map-comp G'))
+    ≡∘ ≡-sym (assoc (fmap G' (α b)) (fmap (G' ⇐ F) f) (β (map F a)))
+    ≡∘ cong (fmap G' (α b) ∘_) (ntl-β {map F a} {map F b} {fmap F f})
+    ≡∘ assoc (fmap G' (α b)) (β (map F b)) (fmap (G ⇐ F) f)
     }
   }
 
@@ -97,7 +97,7 @@ _<~∘h_ = nt-horizontal
 nt-func-horizontal : {G G' : Functor 𝓓 𝓔}
   → (β : NT G G')
   → (F : Functor 𝓒 𝓓)
-  → NT (G ⇐∘ F) (G' ⇐∘ F)
+  → NT (G ⇐ F) (G' ⇐ F)
 nt-func-horizontal β F = β <~∘h identity-nt F
 
 _<~∘⇐_ = nt-func-horizontal
@@ -105,7 +105,7 @@ _<~∘⇐_ = nt-func-horizontal
 func-nt-horizontal : {F F' : Functor 𝓒 𝓓}
   → (G : Functor 𝓓 𝓔)
   → (α : NT F F')
-  → NT (G ⇐∘ F) (G ⇐∘ F')
+  → NT (G ⇐ F) (G ⇐ F')
 func-nt-horizontal G α = identity-nt G <~∘h α
 
 _⇐∘<~_ = func-nt-horizontal

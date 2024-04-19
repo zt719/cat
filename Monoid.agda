@@ -13,58 +13,63 @@ record Monoid {i} : UU (lsuc i) where
     _⊕_      : obj → obj → obj
 
     -- Monoidal Laws --
-    mon-left-id  : (a : obj) → ε ⊕ a ≡ a
-    mon-right-id : (a : obj) → a ⊕ ε ≡ a
-    mon-assoc    : (a b c : obj) → (a ⊕ b) ⊕ c ≡ a ⊕ (b ⊕ c)
+    left-id  : (a : obj) → ε ⊕ a ≡ a
+    right-id : (a : obj) → a ⊕ ε ≡ a
+    assoc    : (a b c : obj) → (a ⊕ b) ⊕ c ≡ a ⊕ (b ⊕ c)
 open Monoid
 
 -- Homomorphism between Monoids --
-record _-m→_ (M : Monoid {i}) (N : Monoid {j}) : UU (i ⊔ j) where
+record MH (M : Monoid {i}) (N : Monoid {j}) : UU (i ⊔ j) where
   field
-    map-obj : obj M → obj N 
-    M-comp  : {a b : obj M}
-      → map-obj ((_⊕_) M a b) ≡ (_⊕_) N (map-obj a) (map-obj b)
+    -- Component --
+    map  : obj M → obj N
 
--m→-refl : {M : Monoid {i}} → M -m→ M
--m→-refl
+    -- Preserving Structure --
+    map-comp : {a b : obj M} → map ((_⊕_) M a b) ≡ (_⊕_) N (map a) (map b)
+open MH
+
+mh-refl : {M : Monoid {i}} → MH M M
+mh-refl
   = record
-  { map-obj = →-refl
-  ; M-comp = ≡-refl
+  { map  = →-refl
+  ; map-comp = ≡-refl
   }
 
--m→-trans : {M : Monoid {i}} {N : Monoid {j}} {P : Monoid {k}}
-  → N -m→ P → M -m→ N → M -m→ P
--m→-trans
-  record { map-obj = map-obj-NP ; M-comp = M-comp-NP }
-  record { map-obj = map-obj-MN ; M-comp = M-comp-MN }
+mh-trans : {M : Monoid {i}} {N : Monoid {j}} {P : Monoid {k}}
+  → (f : MH N P) (g : MH M N) → MH M P
+mh-trans
+  record { map = map-f ; map-comp = map-comp-f }
+  record { map = map-g ; map-comp = map-comp-g }
   = record
-    { map-obj = →-trans map-obj-NP map-obj-MN
-    ; M-comp = ≡-trans M-comp-NP (cong map-obj-NP M-comp-MN)
+    { map  = →-trans map-f map-g
+    ; map-comp = ≡-trans map-comp-f (cong map-f map-comp-g)
     }
 
+_←mh-_ = mh-trans
+
 postulate
-  -m→-left-id : {M : Monoid {i}} {N : Monoid {j}}
-    → (mm : M -m→ N)
-    → -m→-trans -m→-refl mm ≡ mm
+  mh-left-id : {M : Monoid {i}} {N : Monoid {j}}
+    → (f : MH M N)
+    → mh-refl ←mh- f ≡ f
 
-  -m→-right-id : {M : Monoid {i}} {N : Monoid {j}}
-    → (mm : M -m→ N)
-    → -m→-trans mm -m→-refl ≡ mm
+  mh-right-id : {M : Monoid {i}} {N : Monoid {j}}
+    → (f : MH M N)
+    → f ←mh- mh-refl ≡ f
 
-  -m→-assoc : {M : Monoid {i}} {N : Monoid {j}} {P : Monoid {k}} {Q : Monoid {l}}
-    → (pq : P -m→ Q) → (np : N -m→ P) → (mn : M -m→ N)
-    → -m→-trans (-m→-trans pq np) mn ≡ -m→-trans pq (-m→-trans np mn)
+  mh-assoc : {M : Monoid {i}} {N : Monoid {j}} {P : Monoid {k}} {Q : Monoid {l}}
+    → (f : MH P Q) (g : MH N P) (h : MH M N)
+    → (f ←mh- g) ←mh- h ≡ f ←mh- (g ←mh- h)
 
 MON : {i : Level} → Category {lsuc i} {i}
 MON {i = i}
   = record
   { obj = Monoid {i}
-  ; hom = _-m→_
-  ; id  = -m→-refl
-  ; _∘_ = -m→-trans
-  ; cat-left-id  = -m→-left-id
-  ; cat-right-id = -m→-right-id
-  ; cat-assoc    = -m→-assoc
+  ; hom = MH
+  ; id  = mh-refl
+  ; _∘_ = mh-trans
+  ; left-id  = mh-left-id
+  ; right-id = mh-right-id
+  ; assoc    = mh-assoc
   }
       
 ℕ-+-0-monoid : Monoid
@@ -73,9 +78,9 @@ MON {i = i}
   { obj = ℕ
   ; ε   = 0
   ; _⊕_ = _+_
-  ; mon-left-id  = +-left-id
-  ; mon-right-id = +-right-id
-  ; mon-assoc    = +-assoc
+  ; left-id  = +-left-id
+  ; right-id = +-right-id
+  ; assoc    = +-assoc
   }
 
 ℕ-*-1-monoid : Monoid
@@ -84,9 +89,9 @@ MON {i = i}
   { obj = ℕ
   ; ε   = 1
   ; _⊕_ = _*_
-  ; mon-left-id  = *-left-id
-  ; mon-right-id = *-right-id
-  ; mon-assoc    = *-assoc
+  ; left-id  = *-left-id
+  ; right-id = *-right-id
+  ; assoc    = *-assoc
   }
 
 free-monoid : {i : Level}
@@ -96,9 +101,9 @@ free-monoid A
   { obj = List A
   ; ε   = []
   ; _⊕_ = _++_
-  ; mon-left-id  = ++-left-id
-  ; mon-right-id = ++-right-id
-  ; mon-assoc    = ++-assoc
+  ; left-id  = ++-left-id
+  ; right-id = ++-right-id
+  ; assoc    = ++-assoc
   }
   
 monoid-as-category : {i : Level}
@@ -106,14 +111,14 @@ monoid-as-category : {i : Level}
 monoid-as-category
   record
   { obj = obj ; ε = ε ; _⊕_ = _⊕_
-  ; mon-left-id = mon-left-id ; mon-right-id = mon-right-id ; mon-assoc = mon-assoc
+  ; left-id = left-id ; right-id = right-id ; assoc = assoc
   }
   = record
   { obj = 𝟙
   ; hom = λ _ _ → obj
   ; id  = ε
   ; _∘_ = _⊕_
-  ; cat-left-id  = mon-left-id
-  ; cat-right-id = mon-right-id
-  ; cat-assoc    = mon-assoc
+  ; left-id  = left-id
+  ; right-id = right-id
+  ; assoc    = assoc
   }

@@ -12,12 +12,12 @@ record Category {i} {j} : UU (lsuc (i ⊔ j)) where
     _∘_ : {a b c : obj}
       → hom b c → hom a b → hom a c
     -- Category Laws -- 
-    cat-left-id  : {a b : obj} → (f : hom a b) → id ∘ f ≡ f
-    cat-right-id : {a b : obj} → (f : hom a b) → f ∘ id ≡ f
-    cat-assoc    : {a b c d : obj}
+    left-id  : {a b : obj} → (f : hom a b) → id ∘ f ≡ f
+    right-id : {a b : obj} → (f : hom a b) → f ∘ id ≡ f
+    assoc    : {a b c d : obj}
       → (f : hom c d) (g : hom b c) (h : hom a b)
       → (f ∘ g) ∘ h ≡ f ∘ (g ∘ h)
-open Category public
+open Category
 
 SET : Category 
 SET
@@ -26,9 +26,9 @@ SET
   ; hom = λ a b → (a → b)
   ; id = →-refl
   ; _∘_ = →-trans
-  ; cat-left-id = →-left-id
-  ; cat-right-id = →-right-id
-  ; cat-assoc = →-assoc
+  ; left-id = →-left-id
+  ; right-id = →-right-id
+  ; assoc = →-assoc
   }
 
 ℕ-≤-preorder : Category
@@ -38,9 +38,9 @@ SET
   ; hom = _≤_
   ; id = ≤-refl
   ; _∘_ = ≤-trans
-  ; cat-left-id = ≤-left-id
-  ; cat-right-id = ≤-right-id
-  ; cat-assoc = ≤-assoc 
+  ; left-id = ≤-left-id
+  ; right-id = ≤-right-id
+  ; assoc = ≤-assoc 
   }
 
 -- Monoids as Categories
@@ -51,9 +51,9 @@ M-+
   ; hom = λ _ _ → ℕ
   ; id  = 0
   ; _∘_ = _+_
-  ; cat-left-id  = +-left-id
-  ; cat-right-id = +-right-id
-  ; cat-assoc    = +-assoc
+  ; left-id  = +-left-id
+  ; right-id = +-right-id
+  ; assoc    = +-assoc
   }
 
 M-* : Category
@@ -63,19 +63,19 @@ M-*
   ; hom = λ _ _ → ℕ
   ; id  = 1
   ; _∘_ = _*_
-  ; cat-left-id  = *-left-id
-  ; cat-right-id = *-right-id
-  ; cat-assoc    = *-assoc
+  ; left-id  = *-left-id
+  ; right-id = *-right-id
+  ; assoc    = *-assoc
   }
     
 _op : {i j : Level} → Category {i} {j} → Category {i} {j}
-_op record { obj = obj ; hom = hom ; id = id ; _∘_ = _∘_ ; cat-left-id = cat-left-id ; cat-right-id = cat-right-id ; cat-assoc = cat-assoc }
+_op record { obj = obj ; hom = hom ; id = id ; _∘_ = _∘_ ; left-id = left-id ; right-id = right-id ; assoc = assoc }
   = record
   { obj = obj
   ; hom = λ a b → hom b a
   ; id  = id
   ; _∘_ = λ f g → g ∘ f
-  ; cat-left-id  = cat-right-id
-  ; cat-right-id = cat-left-id
-  ; cat-assoc    = λ f g h → ≡-sym (cat-assoc h g f)
+  ; left-id  = right-id
+  ; right-id = left-id
+  ; assoc    = λ f g h → ≡-sym (assoc h g f)
   }
