@@ -12,14 +12,13 @@ private variable 𝓓 : Category {l₃} {l₄}
 private variable 𝓔 : Category {l₅} {l₆}
 private variable 𝓕 : Category {l₇} {l₈}
 
-record Functor (𝓒 : Category {l₁} {l₂} ) (𝓓 : Category {l₃} {l₄}) : UU (l₁ ⊔ l₂ ⊔ l₃ ⊔ l₄) where
+record Functor (𝓒 : Category {l₁} {l₂} ) (𝓓 : Category {l₃} {l₄})
+  : UU (l₁ ⊔ l₂ ⊔ l₃ ⊔ l₄) where
   open Category.Category
   field
-    -- Components --
     map : obj 𝓒 → obj 𝓓
     fmap : {a b : obj 𝓒} → hom 𝓒 a b → hom 𝓓 (map a) (map b)
-
-    -- Functor Laws --
+    
     map-id   : {a : obj 𝓒} → fmap (id 𝓒 {a}) ≡ id 𝓓 {map a}
     map-comp : {a b c : obj 𝓒} {f : hom 𝓒 b c} {g : hom 𝓒 a b}
       → fmap ((_∘_) 𝓒 f g) ≡ (_∘_) 𝓓 (fmap f) (fmap g)

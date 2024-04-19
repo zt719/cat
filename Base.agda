@@ -120,12 +120,18 @@ _∘≤_ = ≤-trans
 ≤-assoc _ _ z≤n = refl
 ≤-assoc (s≤s f) (s≤s g) (s≤s h) = cong s≤s (≤-assoc f g h)
 
++-refl : ℕ
++-refl = 0
+
++-trans : ℕ → ℕ → ℕ
++-trans = _+_
+
 +-left-id : (a : ℕ)
-  → 0 + a ≡ a
+  → +-refl + a ≡ a
 +-left-id a = refl
 
 +-right-id : (a : ℕ)
-  → a + 0 ≡ a
+  → a + +-refl ≡ a
 +-right-id zero    = refl
 +-right-id (suc a) = cong suc (+-right-id a)
 
@@ -134,22 +140,21 @@ _∘≤_ = ≤-trans
 +-assoc zero    b c = refl
 +-assoc (suc a) b c = cong suc (+-assoc a b c)
 
+*-refl : ℕ
+*-refl = 1
+
+*-trans : ℕ → ℕ → ℕ
+*-trans = _*_
+
 *-left-id : (a : ℕ)
-  → 1 * a ≡ a
+  → *-refl * a ≡ a
 *-left-id zero    = refl
 *-left-id (suc a) = cong suc (*-left-id a)
 
 *-right-id : (a : ℕ)
-  → a * 1 ≡ a
+  → a * *-refl ≡ a
 *-right-id zero    = refl
 *-right-id (suc a) = cong suc (*-right-id a)
-
-*-+-dist :
-    (a b c : ℕ)
-  → (a + b) * c ≡ a * c + b * c
-*-+-dist zero    b c = refl
-*-+-dist (suc a) b c = ≡-sym (+-assoc c (a * c) (b * c))
-  ≡∘ cong (c +_) (*-+-dist a b c)
 
 *-assoc :
     (a b c : ℕ)
@@ -157,19 +162,31 @@ _∘≤_ = ≤-trans
 *-assoc zero    b c = refl
 *-assoc (suc a) b c = cong (b * c +_) (*-assoc a b c)
   ≡∘ *-+-dist b (a * b) c
+  where
+  *-+-dist :
+    (a b c : ℕ)
+    → (a + b) * c ≡ a * c + b * c
+  *-+-dist zero    b c = refl
+  *-+-dist (suc a) b c = ≡-sym (+-assoc c (a * c) (b * c))
+    ≡∘ cong (c +_) (*-+-dist a b c)
+
+++-refl : List A
+++-refl = []
 
 _++_ : List A → List A → List A
 [] ++ bs = bs
 (x ∷ as) ++ bs = x ∷ (as ++ bs)
 
+++-trans = _++_
+
 ++-left-id :
     (l : List A)
-  → [] ++ l ≡ l
+  → ++-refl ++ l ≡ l
 ++-left-id l = refl
 
 ++-right-id :
     (l : List A)
-  → l ++ [] ≡ l
+  → l ++ ++-refl ≡ l
 ++-right-id []      = refl
 ++-right-id (x ∷ l) = cong (x ∷_) (++-right-id l)
 
