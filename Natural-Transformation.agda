@@ -12,12 +12,13 @@ private variable 𝓕 : Category {l₇} {l₈}
 
 record NT {𝓒 : Category {l₁} {l₂}} {𝓓 : Category {l₃} {l₄}}
   (F G : Functor 𝓒 𝓓) : UU (l₁ ⊔ l₂ ⊔ l₃ ⊔ l₄) where
+  constructor NT_,_
   open Category.Category
   open Functor.Functor
   field
-    α : (a : obj 𝓒) → hom 𝓓 (map F a) (map G a)
+    α : {a : obj 𝓒} → hom 𝓓 (map F a) (map G a)
     natural : {a b : obj 𝓒} {f : hom 𝓒 a b}
-      → (_∘_) 𝓓 (α b) (fmap F f) ≡ (_∘_) 𝓓 (fmap G f) (α a)
+      → (_∘_) 𝓓 (α {b}) (fmap F f) ≡ (_∘_) 𝓓 (fmap G f) (α {a})
 open NT
 
 head : {A : UU l₁}
@@ -27,7 +28,7 @@ head (a ∷ as) = just a
 
 head-as-nt : NT list-functor maybe-functor
 head-as-nt = record
-  { α = λ _ → head
+  { α = head
   ; natural = ext (λ{ [] → refl ; (a ∷ as) → refl })
   }
 
@@ -39,7 +40,7 @@ nt-refl
   {𝓒 = record { id = id ; left-id = left-id ; right-id = right-id }}
   {F = record { fmap = fmap ; map-comp = map-comp }}
   = record
-  { α = λ a → fmap (id {a})
+  { α = fmap id
   ; natural = λ
     { {f = f} → map-comp
     ≡∘ cong fmap (≡-sym (right-id f) ≡∘ left-id f)
@@ -61,23 +62,24 @@ nt-trans
   record { α = α ; natural = natural-α }
   record { α = β ; natural = natural-β }
   = record
-  { α = λ a → (α a) ∘ (β a)
+  { α = α ∘ β
   ; natural = λ
-    { {a} {b} {f} → assoc (fmap H f) (α a) (β a)
-    ≡∘ cong (_∘ (β a)) natural-α
-    ≡∘ ≡-sym (assoc (α b) (fmap G f) (β a))
-    ≡∘ cong ((α b) ∘_) natural-β
-    ≡∘ assoc (α b) (β b) (fmap F f)
+    { {a} {b} {f} → assoc (fmap H f) (α {a}) (β {a})
+    ≡∘ cong (_∘ (β {a})) natural-α
+    ≡∘ ≡-sym (assoc (α {b}) (fmap G f) (β {a}))
+    ≡∘ cong ((α {b}) ∘_) natural-β
+    ≡∘ assoc (α {b}) (β {b}) (fmap F f)
     }
   }
 
 _~_ = nt-trans
 
+
 postulate
   nt-left-id : {F G : Functor 𝓒 𝓓}
     → (nt : NT F G)
     → nt-refl ~ nt ≡ nt
-
+    
   nt-right-id : {F G : Functor 𝓒 𝓓}
     → (nt : NT F G)
     → nt ~ nt-refl ≡ nt
@@ -96,13 +98,13 @@ nt-horizontal
   record { α = β ; natural = natural-β }
   record { α = α ; natural = natural-α }
   = record
-  { α = λ a → fmap G' (α a) ∘ β (map F a)
+  { α = fmap G' α ∘ β 
   ; natural = λ
-    { {a} {b} {f} → assoc (fmap (G' ⇐ F') f) (fmap G' (α a)) (β (map F a))
-    ≡∘ cong (_∘ β (map F a)) (map-comp G' ≡∘ cong (fmap G') natural-α ≡∘ ≡-sym (map-comp G'))
-    ≡∘ ≡-sym (assoc (fmap G' (α b)) (fmap (G' ⇐ F) f) (β (map F a)))
-    ≡∘ cong (fmap G' (α b) ∘_) (natural-β {map F a} {map F b} {fmap F f})
-    ≡∘ assoc (fmap G' (α b)) (β (map F b)) (fmap (G ⇐ F) f)
+    { {a} {b} {f} → assoc (fmap (G' ⇐ F') f) (fmap G' (α {a})) (β {map F a})
+    ≡∘ cong (_∘ β {map F a}) (map-comp G' ≡∘ cong (fmap G') natural-α ≡∘ ≡-sym (map-comp G'))
+    ≡∘ ≡-sym (assoc (fmap G' (α {b})) (fmap (G' ⇐ F) f) (β {map F a}))
+    ≡∘ cong (fmap G' (α {b}) ∘_) (natural-β {map F a} {map F b} {fmap F f})
+    ≡∘ assoc (fmap G' (α {b})) (β {map F b}) (fmap (G ⇐ F) f)
     }
   }
 

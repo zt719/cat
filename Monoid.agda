@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+
 module Monoid where
 
 open import Base
@@ -18,13 +20,9 @@ record Monoid {i} : UU (lsuc i) where
     assoc    : (a b c : obj) → (a ⊕ b) ⊕ c ≡ a ⊕ (b ⊕ c)
 open Monoid
 
-private variable M : Monoid {i}
-private variable N : Monoid {j}
-private variable P : Monoid {k}
-private variable Q : Monoid {l}
-
 -- Homomorphism between Monoids --
 record MH (M : Monoid {i}) (N : Monoid {j}) : UU (i ⊔ j) where
+  constructor MH_,_
   field
     -- Component --
     map  : obj M → obj N
@@ -33,44 +31,39 @@ record MH (M : Monoid {i}) (N : Monoid {j}) : UU (i ⊔ j) where
     map-comp : {a b : obj M} → map ((_⊕_) M a b) ≡ (_⊕_) N (map a) (map b)
 open MH
 
-mh-refl : MH M M
-mh-refl
-  = record
-  { map  = →-refl
-  ; map-comp = ≡-refl
-  }
+mh-refl : {M : Monoid {i}} → MH M M
+mh-refl = MH →-refl , ≡-refl
 
-mh-trans : (f : MH N P) (g : MH M N) → MH M P
+mh-trans : {M : Monoid {i}} {N : Monoid {j}} {P : Monoid {k}}
+  → (f : MH N P) (g : MH M N) → MH M P
 mh-trans
-  record { map = map-f ; map-comp = map-comp-f }
-  record { map = map-g ; map-comp = map-comp-g }
-  = record
-    { map  = map-f ← map-g
-    ; map-comp = map-comp-f ≡∘ cong map-f map-comp-g
-    }
+  (MH map-f , map-comp-f)
+  (MH map-g , map-comp-g)
+  = MH (map-f ← map-g) , (map-comp-f ≡∘ cong map-f map-comp-g)
 
 _←mh-_ = mh-trans
 
-postulate
-  mh-≡ :
-      (f g : MH M N)
-    → map f ≡ map g
-    → f ≡ g
-
-mh-left-id :
-    (f : MH M N)
+mh-left-id : {M : Monoid {i}} {N : Monoid {j}}
+  → (f : MH M N)
   → mh-refl ←mh- f ≡ f
-mh-left-id f = mh-≡ (mh-refl ←mh- f) f refl
+mh-left-id (MH map-f , map-comp-f)
+  = ≅-to-≡ (cong₂-h MH_,_ (≡-to-≅ (→-left-id map-f)) (≡-to-≅ {!≡-left-id map-comp-f!}))
 
-mh-right-id : 
-    (f : MH M N)
+mh-right-id : {M : Monoid {i}} {N : Monoid {j}}
+  → (f : MH M N)
   → f ←mh- mh-refl ≡ f
-mh-right-id f = mh-≡ (f ←mh- mh-refl) f refl
+mh-right-id (MH map-f , map-comp-f)
+  = ≅-to-≡ (cong₂-h MH_,_ (≡-to-≅ (→-right-id map-f)) (≡-to-≅ {!≡-right-id map-comp-f!}))
 
-mh-assoc :
-    (f : MH P Q) (g : MH N P) (h : MH M N)
+mh-assoc : {l₁ l₂ l₃ l₄ : Level}
+  → {M : Monoid {l₁}} {N : Monoid {l₂}} {P : Monoid {l₃}} {Q : Monoid {l₄}}
+  → (f : MH P Q) (g : MH N P) (h : MH M N)
   → (f ←mh- g) ←mh- h ≡ f ←mh- (g ←mh- h)
-mh-assoc f g h = mh-≡ ((f ←mh- g) ←mh- h) (f ←mh- (g ←mh- h)) refl
+mh-assoc
+  (MH map-f , map-comp-f)
+  (MH map-g , map-comp-g)
+  (MH map-h , map-comp-h)
+  = ≅-to-≡ (cong₂-h MH_,_ (≡-to-≅ (→-assoc map-f map-g map-h)) (≡-to-≅ {!!}))
 
 MON : Category {lsuc i} {i}
 MON {i = i}
@@ -132,3 +125,10 @@ monoid-as-category
   ; right-id = right-id
   ; assoc    = assoc
   }
+
+record Test : UU (lsuc i) where
+  field
+    t : UU i
+    ft : UU i → UU i → UU i
+open Test
+

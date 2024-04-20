@@ -22,11 +22,41 @@ postulate
     → ((x : A) → f x ≡ g x)
     → f ≡ g
 
-cong : (f : A → B) {x y : A}
-  → x ≡ y
-    ---------
-  → f x ≡ f y
-cong f refl  =  refl
+infix 4 _≅_
+
+data _≅_ {ℓ} {A : UU ℓ} (x : A) : {B : UU ℓ} → B → UU ℓ where
+   refl : x ≅ x
+
+------------------------------------------------------------------------
+-- Conversion
+
+≅-to-≡ : ∀ {a} {A : Set a} {x y : A} → x ≅ y → x ≡ y
+≅-to-≡ refl = refl
+
+≡-to-≅ : ∀ {a} {A : Set a} {x y : A} → x ≡ y → x ≅ y
+≡-to-≅ refl = refl
+
+cong-h : ∀ {a b} {A : UU a} {B : A → UU b} {x y}
+       (f : (x : A) → B x) → x ≅ y → f x ≅ f y
+cong-h f refl = refl
+
+cong₂-h : ∀ {a b c} {A : Set a} {B : A → Set b} {C : ∀ x → B x → Set c}
+          {x y u v}
+        (f : (x : A) (y : B x) → C x y) → x ≅ y → u ≅ v → f x u ≅ f y v
+cong₂-h f refl refl = refl
+
+cong : {A : UU i} {B : UU j} {x₁ x₂ : A}
+  → (f : A → B)
+  → x₁ ≡ x₂
+  → f x₁ ≡ f x₂
+cong f refl = refl
+
+cong₂ : {A : UU i} 
+  → (f : A → B → C) {x₁ y₁ : A} {x₂ y₂ : B}
+  → x₁ ≡ y₁
+  → x₂ ≡ y₂
+  → f x₁ x₂ ≡ f y₁ y₂
+cong₂ f refl refl = refl
 
 infix  4 _≤_
 data _≤_ : ℕ → ℕ → UU where

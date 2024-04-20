@@ -49,7 +49,7 @@ M-+
   = record
   { obj = 𝟙
   ; hom = λ _ _ → ℕ
-  ; id  = 0
+  ; id  = +-refl
   ; _∘_ = _+_
   ; left-id  = +-left-id
   ; right-id = +-right-id
@@ -61,7 +61,7 @@ M-*
   = record
   { obj = 𝟙
   ; hom = λ _ _ → ℕ
-  ; id  = 1
+  ; id  = *-refl
   ; _∘_ = _*_
   ; left-id  = *-left-id
   ; right-id = *-right-id
