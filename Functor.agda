@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+
 module Functor where
 
 open import Category
@@ -14,6 +16,7 @@ private variable 𝓕 : Category {l₇} {l₈}
 
 record Functor (𝓒 : Category {l₁} {l₂} ) (𝓓 : Category {l₃} {l₄})
   : UU (l₁ ⊔ l₂ ⊔ l₃ ⊔ l₄) where
+  constructor Functor_,_,_,_
   open Category.Category
   field
     map : obj 𝓒 → obj 𝓓
@@ -28,18 +31,12 @@ Endofunctor : Category {l₁} {l₂} → UU (l₁ ⊔ l₂)
 Endofunctor 𝓒 = Functor 𝓒 𝓒
 
 func-refl : Functor 𝓒 𝓒
-func-refl
-  = record
-  { map  = →-refl
-  ; fmap = →-refl
-  ; map-id   = ≡-refl
-  ; map-comp = ≡-refl
-  }
+func-refl = Functor →-refl , →-refl , ≡-refl , ≡-refl
 
 func-trans : Functor 𝓓 𝓔 → Functor 𝓒 𝓓 → Functor 𝓒 𝓔
 func-trans
-  record { map = map-F ; fmap = fmap-F ; map-id = map-id-F ; map-comp = map-comp-F }
-  record { map = map-G ; fmap = fmap-G ; map-id = map-id-G ; map-comp = map-comp-G }
+  (Functor map-F , fmap-F , map-id-F , map-comp-F)
+  (Functor map-G , fmap-G , map-id-G , map-comp-G)
   = record
   { map  = map-F ← map-G
   ; fmap = fmap-F ← fmap-G
@@ -49,24 +46,20 @@ func-trans
 
 _⇐_ = func-trans
 
-postulate
-  func-≡ : (F D : Functor 𝓒 𝓓)
-    → map F ≡ map D
-    → F ≡ D
-
 func-left-id :
     (F : Functor 𝓒 𝓓)
   → func-refl ⇐ F ≡ F
-func-left-id F = func-≡ (func-refl ⇐ F) F refl
+func-left-id F
+  = ≅-to-≡ (cong₄-h Functor_,_,_,_ (≡-to-≅ (→-left-id (map F))) (≡-to-≅ {!→-left-id ?!}) {!!} {!!})
 
 func-right-id :
     (F : Functor 𝓒 𝓓)
   → F ⇐ func-refl ≡ F
-func-right-id F = func-≡ (F ⇐ func-refl) F refl
+func-right-id F = {!!}
 
 func-assoc : (F : Functor 𝓔 𝓕) (G : Functor 𝓓 𝓔) (H : Functor 𝓒 𝓓)
   → (F ⇐ G) ⇐ H ≡ F ⇐ (G ⇐ H)
-func-assoc F G H = func-≡ ((F ⇐ G) ⇐ H) (F ⇐ (G ⇐ H)) refl
+func-assoc F G H = {!!}
 
 
 maybe-functor : Endofunctor SET

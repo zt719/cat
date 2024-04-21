@@ -117,7 +117,7 @@ monoid-as-category
   ; left-id = left-id ; right-id = right-id ; assoc = assoc
   }
   = record
-  { obj = 𝟙
+  { obj = ⊤
   ; hom = λ _ _ → obj
   ; id  = ε
   ; _∘_ = _⊕_

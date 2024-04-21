@@ -4,6 +4,7 @@ module Category where
 open import Base public
 
 record Category {i} {j} : UU (lsuc (i ⊔ j)) where
+  constructor Category_,_,_,_,_,_,_
   field  
     -- Components --
     obj : UU i
@@ -19,7 +20,7 @@ record Category {i} {j} : UU (lsuc (i ⊔ j)) where
       → (f ∘ g) ∘ h ≡ f ∘ (g ∘ h)
 open Category
 
-SET : Category 
+SET : Category
 SET
   = record
   { obj = UU
@@ -47,7 +48,7 @@ SET
 M-+ : Category
 M-+
   = record
-  { obj = 𝟙
+  { obj = ⊤
   ; hom = λ _ _ → ℕ
   ; id  = +-refl
   ; _∘_ = _+_
@@ -59,7 +60,7 @@ M-+
 M-* : Category
 M-*
   = record
-  { obj = 𝟙
+  { obj = ⊤
   ; hom = λ _ _ → ℕ
   ; id  = *-refl
   ; _∘_ = _*_
@@ -69,13 +70,6 @@ M-*
   }
     
 _op : {i j : Level} → Category {i} {j} → Category {i} {j}
-_op record { obj = obj ; hom = hom ; id = id ; _∘_ = _∘_ ; left-id = left-id ; right-id = right-id ; assoc = assoc }
-  = record
-  { obj = obj
-  ; hom = λ a b → hom b a
-  ; id  = id
-  ; _∘_ = λ f g → g ∘ f
-  ; left-id  = right-id
-  ; right-id = left-id
-  ; assoc    = λ f g h → ≡-sym (assoc h g f)
-  }
+(Category obj , hom , id , _∘_ , left-id , right-id , assoc) op
+  = Category obj , (λ a b → hom b a) , id , (λ f g → g ∘ f)
+  , right-id , left-id , λ f g h → ≡-sym (assoc h g f)

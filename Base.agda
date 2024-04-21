@@ -8,55 +8,57 @@ open import Agda.Builtin.Nat public
 open import Agda.Builtin.List public
 open import Agda.Builtin.Maybe public
 open import Agda.Builtin.Unit public
-  renaming (⊤ to 𝟙; tt to ＊)
-
-private variable i j k l : Level
-private variable A : UU i
-private variable B : UU j
-private variable C : UU k
-private variable D : UU l
 
 -- Extensionality --
 postulate
-  ext : {f g : A → B}
+  ext : {l₁ l₂ : Level} {A : UU l₁} {B : UU l₂}
+    → {f g : A → B}
     → ((x : A) → f x ≡ g x)
     → f ≡ g
 
+-- Heterogenous Equality
 infix 4 _≅_
 
 data _≅_ {ℓ} {A : UU ℓ} (x : A) : {B : UU ℓ} → B → UU ℓ where
    refl : x ≅ x
 
-------------------------------------------------------------------------
--- Conversion
-
-≅-to-≡ : ∀ {a} {A : Set a} {x y : A} → x ≅ y → x ≡ y
+≅-to-≡ : ∀ {a} {A : UU a} {x y : A} → x ≅ y → x ≡ y
 ≅-to-≡ refl = refl
 
-≡-to-≅ : ∀ {a} {A : Set a} {x y : A} → x ≡ y → x ≅ y
+≡-to-≅ : ∀ {a} {A : UU a} {x y : A} → x ≡ y → x ≅ y
 ≡-to-≅ refl = refl
 
 cong-h : ∀ {a b} {A : UU a} {B : A → UU b} {x y}
        (f : (x : A) → B x) → x ≅ y → f x ≅ f y
 cong-h f refl = refl
 
-cong₂-h : ∀ {a b c} {A : Set a} {B : A → Set b} {C : ∀ x → B x → Set c}
+cong₂-h : ∀ {a b c} {A : UU a} {B : A → UU b} {C : ∀ x → B x → UU c}
           {x y u v}
         (f : (x : A) (y : B x) → C x y) → x ≅ y → u ≅ v → f x u ≅ f y v
 cong₂-h f refl refl = refl
 
-cong : {A : UU i} {B : UU j} {x₁ x₂ : A}
+cong₃-h : ∀ {l₁ l₂ l₃ l₄} {A : UU l₁} {B : A → UU l₂} {C : (x : A) → B x → UU l₃}
+          {D : (x : A) (y : B x) (z : C x y) → UU l₄}
+          {x x' y y' z z'}
+          (f : (x : A) (y : B x) (z : C x y) → D x y z) → x ≅ x' → y ≅ y' → z ≅ z' → f x y z ≅ f x' y' z'
+cong₃-h f refl refl refl = refl
+
+cong₄-h : ∀ {l₁ l₂ l₃ l₄ l₅}
+          {A : UU l₁} {B : A → UU l₂} {C : (x : A) (y : B x) → UU l₃}
+          {D : (x : A) (y : B x) (z : C x y) → UU l₄}
+          {E : (x : A) (y : B x) (z : C x y) (m : D x y z) → UU l₅}
+          {x x' y y' z z' m m'}
+          (f : (x : A) (y : B x) (z : C x y) (m : D x y z) → E x y z m)
+          → x ≅ x' → y ≅ y' → z ≅ z' → m ≅ m'
+          → f x y z m ≅ f x' y' z' m'
+cong₄-h f refl refl refl refl = refl
+
+
+cong : ∀ {i j} {A : UU i} {B : UU j} {x₁ x₂ : A}
   → (f : A → B)
   → x₁ ≡ x₂
   → f x₁ ≡ f x₂
 cong f refl = refl
-
-cong₂ : {A : UU i} 
-  → (f : A → B → C) {x₁ y₁ : A} {x₂ y₂ : B}
-  → x₁ ≡ y₁
-  → x₂ ≡ y₂
-  → f x₁ x₂ ≡ f y₁ y₂
-cong₂ f refl refl = refl
 
 infix  4 _≤_
 data _≤_ : ℕ → ℕ → UU where
@@ -66,56 +68,57 @@ data _≤_ : ℕ → ℕ → UU where
     → m ≤ n
     → suc m ≤ suc n
 
-≡-refl : {x : A}
+≡-refl : ∀ {i} {A : UU i} {x : A}
   → x ≡ x
 ≡-refl = refl
 
-≡-sym : {x y : A}
+≡-sym : ∀ {i} {A : UU i} {x y : A}
   → x ≡ y → y ≡ x
 ≡-sym refl = refl
 
-≡-trans : {x y z : A}
+≡-trans : ∀ {i} {A : UU i} {x y z : A}
   → y ≡ z → x ≡ y → x ≡ z
 ≡-trans refl refl = refl
 
 infixl 5 _≡∘_
 _≡∘_ = ≡-trans
 
-≡-left-id : {x y : A}
+≡-left-id : ∀ {i} {A : UU i} {x y : A}
   → (p : x ≡ y)
   → ≡-refl ≡∘ p ≡ p
 ≡-left-id refl = refl
 
-≡-right-id : {x y : A}
+≡-right-id : ∀ {i} {A : UU i} {x y : A}
   → (p : x ≡ y)
   → p ≡∘ ≡-refl ≡ p
 ≡-right-id refl = refl
 
-≡-assoc : {x y z h : A}
+≡-assoc : ∀ {i} {A : UU i} {x y z h : A}
   → (p : z ≡ h) (q : y ≡ z) (r : x ≡ y)
   → (p ≡∘ q) ≡∘ r ≡ p ≡∘ (q ≡∘ r)
 ≡-assoc refl refl refl = refl
 
 
-→-refl : A → A
+→-refl : ∀ {i} {A : UU i} → A → A
 →-refl a = a
 
-→-trans : (B → C) → (A → B) → (A → C)
+→-trans : ∀ {i j k} {A : UU i} {B : UU j} {C : UU k}
+  → (B → C) → (A → B) → (A → C)
 →-trans f g x = f (g x)
 
 _←_ = →-trans
 
-→-left-id :
-    (f : A → B)
+→-left-id : ∀ {i j} {A : UU i} {B : UU j}
+  → (f : A → B)
   → →-refl ← f ≡ f
 →-left-id f = refl
 
-→-right-id :
+→-right-id : ∀ {i j} {A : UU i} {B : UU j}
     (f : A → B)
   → f ← →-refl ≡ f
 →-right-id f = refl
 
-→-assoc :
+→-assoc : ∀ {l₁ l₂ l₃ l₄} {A : UU l₁} {B : UU l₂} {C : UU l₃} {D : UU l₄}
     (f : C → D) (g : B → C) (h : A → B)
   → (f ← g) ← h ≡ f ← (g ← h)
 →-assoc f g h = refl
@@ -200,28 +203,30 @@ _∘≤_ = ≤-trans
   *-+-dist (suc a) b c = ≡-sym (+-assoc c (a * c) (b * c))
     ≡∘ cong (c +_) (*-+-dist a b c)
 
-++-refl : List A
+++-refl : ∀ {i} {A : UU i}
+  → List A
 ++-refl = []
 
-_++_ : List A → List A → List A
+_++_ : ∀ {i} {A : UU i}
+  → List A → List A → List A
 [] ++ bs = bs
 (x ∷ as) ++ bs = x ∷ (as ++ bs)
 
 ++-trans = _++_
 
-++-left-id :
-    (l : List A)
+++-left-id : ∀ {i} {A : UU i}
+  → (l : List A)
   → ++-refl ++ l ≡ l
 ++-left-id l = refl
 
-++-right-id :
-    (l : List A)
+++-right-id : ∀ {i} {A : UU i}
+  → (l : List A)
   → l ++ ++-refl ≡ l
 ++-right-id []      = refl
 ++-right-id (x ∷ l) = cong (x ∷_) (++-right-id l)
 
-++-assoc :
-    (xs ys zs : List A)
+++-assoc : ∀ {i} {A : UU i}
+  → (xs ys zs : List A)
   → (xs ++ ys) ++ zs ≡ xs ++ (ys ++ zs)
 ++-assoc []       ys zs = refl
 ++-assoc (x ∷ xs) ys zs = cong (x ∷_) (++-assoc xs ys zs)
