@@ -74,7 +74,6 @@ nt-trans
 
 _~_ = nt-trans
 
-
 postulate
   nt-left-id : {F G : Functor 𝓒 𝓓}
     → (nt : NT F G)

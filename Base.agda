@@ -16,6 +16,10 @@ postulate
     → ((x : A) → f x ≡ g x)
     → f ≡ g
 
+transport : ∀ {i j} {X : UU i} (A : X → UU j) {x y : X}
+          → x ≡ y → A x → A y
+transport A refl x = x
+
 -- Heterogenous Equality
 infix 4 _≅_
 

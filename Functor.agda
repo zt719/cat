@@ -17,14 +17,15 @@ private variable 𝓕 : Category {l₇} {l₈}
 record Functor (𝓒 : Category {l₁} {l₂} ) (𝓓 : Category {l₃} {l₄})
   : UU (l₁ ⊔ l₂ ⊔ l₃ ⊔ l₄) where
   constructor Functor_,_,_,_
-  open Category.Category
+  open Category.Category 𝓒 renaming (_∘_ to _∘𝓒_)
+  open Category.Category 𝓓 renaming (_∘_ to _∘𝓓_)
   field
     map : obj 𝓒 → obj 𝓓
     fmap : {a b : obj 𝓒} → hom 𝓒 a b → hom 𝓓 (map a) (map b)
     
     map-id   : {a : obj 𝓒} → fmap (id 𝓒 {a}) ≡ id 𝓓 {map a}
     map-comp : {a b c : obj 𝓒} {f : hom 𝓒 b c} {g : hom 𝓒 a b}
-      → fmap ((_∘_) 𝓒 f g) ≡ (_∘_) 𝓓 (fmap f) (fmap g)
+      → fmap (f ∘𝓒 g) ≡ (fmap f) ∘𝓓 (fmap g)
 open Functor
 
 Endofunctor : Category {l₁} {l₂} → UU (l₁ ⊔ l₂)
