@@ -2,12 +2,18 @@ module Base where
 
 open import Agda.Primitive public
   renaming (Set to UU)
+open import Agda.Builtin.Sigma public
 open import Agda.Builtin.Equality public
 open import Agda.Builtin.Nat public
   renaming (Nat to ℕ)
 open import Agda.Builtin.List public
 open import Agda.Builtin.Maybe public
 open import Agda.Builtin.Unit public
+  renaming (⊤ to 𝟙; tt to ＊)
+
+Σ-syntax = Σ
+infix 2 Σ-syntax
+syntax Σ-syntax A (λ x → Bx) = Σ x ∶ A , Bx
 
 -- Extensionality --
 postulate
@@ -20,6 +26,7 @@ transport : ∀ {i j} {X : UU i} (A : X → UU j) {x y : X}
           → x ≡ y → A x → A y
 transport A refl x = x
 
+{-
 -- Heterogenous Equality
 infix 4 _≅_
 
@@ -56,7 +63,7 @@ cong₄-h : ∀ {l₁ l₂ l₃ l₄ l₅}
           → x ≅ x' → y ≅ y' → z ≅ z' → m ≅ m'
           → f x y z m ≅ f x' y' z' m'
 cong₄-h f refl refl refl refl = refl
-
+-}
 
 cong : ∀ {i j} {A : UU i} {B : UU j} {x₁ x₂ : A}
   → (f : A → B)
@@ -94,14 +101,13 @@ _≡∘_ = ≡-trans
 
 ≡-right-id : ∀ {i} {A : UU i} {x y : A}
   → (p : x ≡ y)
-  → p ≡∘ ≡-refl ≡ p
+  → p ≡ p ≡∘ ≡-refl
 ≡-right-id refl = refl
 
 ≡-assoc : ∀ {i} {A : UU i} {x y z h : A}
   → (p : z ≡ h) (q : y ≡ z) (r : x ≡ y)
   → (p ≡∘ q) ≡∘ r ≡ p ≡∘ (q ≡∘ r)
 ≡-assoc refl refl refl = refl
-
 
 →-refl : ∀ {i} {A : UU i} → A → A
 →-refl a = a
@@ -119,7 +125,7 @@ _←_ = →-trans
 
 →-right-id : ∀ {i j} {A : UU i} {B : UU j}
     (f : A → B)
-  → f ← →-refl ≡ f
+  → f ≡ f ← →-refl
 →-right-id f = refl
 
 →-assoc : ∀ {l₁ l₂ l₃ l₄} {A : UU l₁} {B : UU l₂} {C : UU l₃} {D : UU l₄}
@@ -147,7 +153,7 @@ _∘≤_ = ≤-trans
 
 ≤-right-id : {a b : ℕ}
   → (f : a ≤ b)
-  → f ∘≤ ≤-refl ≡ f
+  → f ≡ f ∘≤ ≤-refl
 ≤-right-id z≤n = refl
 ≤-right-id (s≤s f) = cong s≤s (≤-right-id f)
 
@@ -168,7 +174,7 @@ _∘≤_ = ≤-trans
 +-left-id a = refl
 
 +-right-id : (a : ℕ)
-  → a + +-refl ≡ a
+  → a ≡ a + +-refl
 +-right-id zero    = refl
 +-right-id (suc a) = cong suc (+-right-id a)
 
@@ -189,7 +195,7 @@ _∘≤_ = ≤-trans
 *-left-id (suc a) = cong suc (*-left-id a)
 
 *-right-id : (a : ℕ)
-  → a * *-refl ≡ a
+  → a ≡ a * *-refl
 *-right-id zero    = refl
 *-right-id (suc a) = cong suc (*-right-id a)
 
@@ -225,7 +231,7 @@ _++_ : ∀ {i} {A : UU i}
 
 ++-right-id : ∀ {i} {A : UU i}
   → (l : List A)
-  → l ++ ++-refl ≡ l
+  → l ≡ l ++ ++-refl
 ++-right-id []      = refl
 ++-right-id (x ∷ l) = cong (x ∷_) (++-right-id l)
 

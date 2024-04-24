@@ -1,4 +1,4 @@
-module Natural-Transformation where
+module Transformation where
 
 open import Base
 open import Category
@@ -10,53 +10,53 @@ private variable 𝓓 : Category {l₃} {l₄}
 private variable 𝓔 : Category {l₅} {l₆}
 private variable 𝓕 : Category {l₇} {l₈}
 
-record NT {𝓒 : Category {l₁} {l₂}} {𝓓 : Category {l₃} {l₄}}
+record Transformation {𝓒 : Category {l₁} {l₂}} {𝓓 : Category {l₃} {l₄}}
   (F G : Functor 𝓒 𝓓) : UU (l₁ ⊔ l₂ ⊔ l₃ ⊔ l₄) where
-  constructor NT_,_
+  constructor Transformation#_,_
   open Category.Category
   open Functor.Functor
   field
     α : {a : obj 𝓒} → hom 𝓓 (map F a) (map G a)
     natural : {a b : obj 𝓒} {f : hom 𝓒 a b}
       → (_∘_) 𝓓 (α {b}) (fmap F f) ≡ (_∘_) 𝓓 (fmap G f) (α {a})
-open NT
+open Transformation
 
 head : {A : UU l₁}
   → List A → Maybe A
 head [] = nothing
 head (a ∷ as) = just a
 
-head-as-nt : NT list-functor maybe-functor
-head-as-nt = record
+head-as-transformation : Transformation list-functor maybe-functor
+head-as-transformation = record
   { α = head
   ; natural = ext (λ{ [] → refl ; (a ∷ as) → refl })
   }
 
-nt-refl : {F : Functor 𝓒 𝓓}
-  → NT F F
+transformation-refl : {F : Functor 𝓒 𝓓}
+  → Transformation F F
 open Category.Category
 open Functor.Functor
-nt-refl
+transformation-refl
   {𝓒 = record { id = id ; left-id = left-id ; right-id = right-id }}
   {F = record { fmap = fmap ; map-comp = map-comp }}
   = record
   { α = fmap id
   ; natural = λ
     { {f = f} → map-comp
-    ≡∘ cong fmap (≡-sym (right-id f) ≡∘ left-id f)
+    ≡∘ cong fmap (right-id f ≡∘ left-id f)
     ≡∘ ≡-sym map-comp
     }
   }
 
-identity-nt :
-  (F : Functor 𝓒 𝓓) → NT F F
-identity-nt F = nt-refl
+idetransformationity-transformation :
+  (F : Functor 𝓒 𝓓) → Transformation F F
+idetransformationity-transformation F = transformation-refl
 
-nt-trans : {F G H : Functor 𝓒 𝓓}
-  → NT G H → NT F G → NT F H
+transformation-trans : {F G H : Functor 𝓒 𝓓}
+  → Transformation G H → Transformation F G → Transformation F H
 open Category.Category
 open Functor.Functor
-nt-trans
+transformation-trans
   {𝓓 = record { _∘_ = _∘_ ; assoc = assoc }}
   {F = F} {G = G} {H = H}
   record { α = α ; natural = natural-α }
@@ -72,26 +72,26 @@ nt-trans
     }
   }
 
-_~_ = nt-trans
+_~_ = transformation-trans
 
 postulate
-  nt-left-id : {F G : Functor 𝓒 𝓓}
-    → (nt : NT F G)
-    → nt-refl ~ nt ≡ nt
+  transformation-left-id : {F G : Functor 𝓒 𝓓}
+    → (transformation : Transformation F G)
+    → transformation-refl ~ transformation ≡ transformation
     
-  nt-right-id : {F G : Functor 𝓒 𝓓}
-    → (nt : NT F G)
-    → nt ~ nt-refl ≡ nt
+  transformation-right-id : {F G : Functor 𝓒 𝓓}
+    → (transformation : Transformation F G)
+    → transformation ≡ transformation ~ transformation-refl
 
-  nt-assoc : {F G H J : Functor 𝓒 𝓓}
-    → (nt1 : NT H J) (nt2 : NT G H) (nt3 : NT F G)
-    → (nt1 ~ nt2) ~ nt3 ≡ nt1 ~ (nt2 ~ nt3)
+  transformation-assoc : {F G H J : Functor 𝓒 𝓓}
+    → (transformation1 : Transformation H J) (transformation2 : Transformation G H) (transformation3 : Transformation F G)
+    → (transformation1 ~ transformation2) ~ transformation3 ≡ transformation1 ~ (transformation2 ~ transformation3)
 
-nt-horizontal : {F F' : Functor 𝓒 𝓓} {G G' : Functor 𝓓 𝓔}
-  → NT G G' → NT F F' → NT (G ⇐ F) (G' ⇐ F')
+transformation-horizotransformational : {F F' : Functor 𝓒 𝓓} {G G' : Functor 𝓓 𝓔}
+  → Transformation G G' → Transformation F F' → Transformation (G ⇐ F) (G' ⇐ F')
 open Category.Category
 open Functor.Functor
-nt-horizontal
+transformation-horizotransformational
   {𝓔 = record { _∘_ = _∘_ ; assoc = assoc }}
   {F} {F'} {G} {G'}
   record { α = β ; natural = natural-β }
@@ -107,32 +107,32 @@ nt-horizontal
     }
   }
 
-_~h_ = nt-horizontal
+_~h_ = transformation-horizotransformational
 
-nt-func-horizontal : {G G' : Functor 𝓓 𝓔}
-  → (β : NT G G')
+transformation-func-horizotransformational : {G G' : Functor 𝓓 𝓔}
+  → (β : Transformation G G')
   → (F : Functor 𝓒 𝓓)
-  → NT (G ⇐ F) (G' ⇐ F)
-nt-func-horizontal β F = β ~h identity-nt F
+  → Transformation (G ⇐ F) (G' ⇐ F)
+transformation-func-horizotransformational β F = β ~h idetransformationity-transformation F
 
-_~hl_ = nt-func-horizontal
+_~hl_ = transformation-func-horizotransformational
 
-func-nt-horizontal : {F F' : Functor 𝓒 𝓓}
+func-transformation-horizotransformational : {F F' : Functor 𝓒 𝓓}
   → (G : Functor 𝓓 𝓔)
-  → (α : NT F F')
-  → NT (G ⇐ F) (G ⇐ F')
-func-nt-horizontal G α = identity-nt G ~h α
+  → (α : Transformation F F')
+  → Transformation (G ⇐ F) (G ⇐ F')
+func-transformation-horizotransformational G α = idetransformationity-transformation G ~h α
 
-_~hr_ = func-nt-horizontal
+_~hr_ = func-transformation-horizotransformational
 
 FUN : (𝓒 : Category {l₁} {l₂}) (𝓓 : Category {l₃} {l₄}) → Category
 FUN 𝓒 𝓓  = record
        { obj = Functor 𝓒 𝓓
-       ; hom = NT
-       ; id = nt-refl
+       ; hom = Transformation
+       ; id = transformation-refl
        ; _∘_ = _~_
-       ; left-id = nt-left-id
-       ; right-id = nt-right-id
-       ; assoc = nt-assoc
+       ; left-id = transformation-left-id
+       ; right-id = transformation-right-id
+       ; assoc = transformation-assoc
        }
 

@@ -16,7 +16,7 @@ private variable 𝓕 : Category {l₇} {l₈}
 
 record Functor (𝓒 : Category {l₁} {l₂} ) (𝓓 : Category {l₃} {l₄})
   : UU (l₁ ⊔ l₂ ⊔ l₃ ⊔ l₄) where
-  constructor Functor_,_,_,_
+  constructor Functor#_,_,_,_
   open Category.Category 𝓒 renaming (_∘_ to _∘𝓒_)
   open Category.Category 𝓓 renaming (_∘_ to _∘𝓓_)
   field
@@ -32,12 +32,12 @@ Endofunctor : Category {l₁} {l₂} → UU (l₁ ⊔ l₂)
 Endofunctor 𝓒 = Functor 𝓒 𝓒
 
 func-refl : Functor 𝓒 𝓒
-func-refl = Functor →-refl , →-refl , ≡-refl , ≡-refl
+func-refl = Functor# →-refl , →-refl , ≡-refl , ≡-refl
 
 func-trans : Functor 𝓓 𝓔 → Functor 𝓒 𝓓 → Functor 𝓒 𝓔
 func-trans
-  (Functor map-F , fmap-F , map-id-F , map-comp-F)
-  (Functor map-G , fmap-G , map-id-G , map-comp-G)
+  (Functor# map-F , fmap-F , map-id-F , map-comp-F)
+  (Functor# map-G , fmap-G , map-id-G , map-comp-G)
   = record
   { map  = map-F ← map-G
   ; fmap = fmap-F ← fmap-G
@@ -51,7 +51,7 @@ func-left-id :
     (F : Functor 𝓒 𝓓)
   → func-refl ⇐ F ≡ F
 func-left-id F
-  = ≅-to-≡ (cong₄-h Functor_,_,_,_ (≡-to-≅ (→-left-id (map F))) (≡-to-≅ {!→-left-id ?!}) {!!} {!!})
+  = {!!}
 
 func-right-id :
     (F : Functor 𝓒 𝓓)

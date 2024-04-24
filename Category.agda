@@ -4,7 +4,6 @@ module Category where
 open import Base public
 
 record Category {i} {j} : UU (lsuc (i ⊔ j)) where
-  constructor Category_,_,_,_,_,_,_
   field  
     -- Components --
     obj : UU i
@@ -14,7 +13,7 @@ record Category {i} {j} : UU (lsuc (i ⊔ j)) where
       → hom b c → hom a b → hom a c
     -- Category Laws -- 
     left-id  : {a b : obj} → (f : hom a b) → id ∘ f ≡ f
-    right-id : {a b : obj} → (f : hom a b) → f ∘ id ≡ f
+    right-id : {a b : obj} → (f : hom a b) → f ≡ f ∘ id
     assoc    : {a b c d : obj}
       → (f : hom c d) (g : hom b c) (h : hom a b)
       → (f ∘ g) ∘ h ≡ f ∘ (g ∘ h)
@@ -48,7 +47,7 @@ SET
 M-+ : Category
 M-+
   = record
-  { obj = ⊤
+  { obj = 𝟙
   ; hom = λ _ _ → ℕ
   ; id  = +-refl
   ; _∘_ = _+_
@@ -60,7 +59,7 @@ M-+
 M-* : Category
 M-*
   = record
-  { obj = ⊤
+  { obj = 𝟙
   ; hom = λ _ _ → ℕ
   ; id  = *-refl
   ; _∘_ = _*_
@@ -70,6 +69,13 @@ M-*
   }
     
 _op : {i j : Level} → Category {i} {j} → Category {i} {j}
-(Category obj , hom , id , _∘_ , left-id , right-id , assoc) op
-  = Category obj , (λ a b → hom b a) , id , (λ f g → g ∘ f)
-  , right-id , left-id , λ f g h → ≡-sym (assoc h g f)
+record { obj = obj ; hom = hom ; id = id ; _∘_ = _∘_ ; left-id = left-id ; right-id = right-id ; assoc = assoc } op
+  = record
+     { obj = obj
+     ; hom = λ a b  → hom b a
+     ; id = id
+     ; _∘_ = λ f g → g ∘ f
+     ; left-id = λ f → ≡-sym (right-id f)
+     ; right-id = λ f → ≡-sym (left-id f)
+     ; assoc = λ f g h → ≡-sym (assoc h g f)
+     }
