@@ -8,10 +8,14 @@ open import Agda.Builtin.Nat public
   renaming (Nat to ℕ)
 open import Agda.Builtin.List public
 open import Agda.Builtin.Maybe public
+open import Agda.Builtin.Char public
 
 Σ-syntax = Σ
 infix 2 Σ-syntax
 syntax Σ-syntax A (λ x → Bx) = Σ x ∶ A , Bx
+
+_×_ : {i j : Level} → UU i → UU j → UU (i ⊔ j)
+A × B = Σ A (λ _ → B)
 
 -- Extensionality --
 postulate

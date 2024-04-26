@@ -48,7 +48,7 @@ _≅_ = Isomorphism
 
 record Product {𝓒 : Category {i} {j}}
   (a b : Category.obj 𝓒) : UU (i ⊔ j) where
-  constructor _×_
+  constructor _ẋ_
   open Category.Category 𝓒
   field
     product : obj

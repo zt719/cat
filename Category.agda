@@ -1,7 +1,8 @@
 
 module Category where
 
-open import Base public
+open import Base
+open import Graph
 
 record Category {i} {j} : UU (lsuc (i ⊔ j)) where
   field  
@@ -78,6 +79,17 @@ NONE = record
         ; right-id = λ ()
         ; assoc = λ _ _ ()
         }
+
+graph-as-Cat : Category
+graph-as-Cat = record
+               { obj = Point
+               ; hom = Arrow
+               ; id = arrow-refl
+               ; _∘_ = arrow-trans
+               ; left-id = arrow-left-id
+               ; right-id = arrow-right-id
+               ; assoc = arrow-assoc
+               }
     
 _op : {i j : Level} → Category {i} {j} → Category {i} {j}
 record { obj = obj ; hom = hom ; id = id ; _∘_ = _∘_ ; left-id = left-id ; right-id = right-id ; assoc = assoc } op
