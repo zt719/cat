@@ -67,6 +67,17 @@ M-*
   ; right-id = *-right-id
   ; assoc    = *-assoc
   }
+
+NONE : Category
+NONE = record
+        { obj = 𝟘
+        ; hom = 𝟘⇒
+        ; id = λ {}
+        ; _∘_ = λ _ ()
+        ; left-id = λ ()
+        ; right-id = λ ()
+        ; assoc = λ _ _ ()
+        }
     
 _op : {i j : Level} → Category {i} {j} → Category {i} {j}
 record { obj = obj ; hom = hom ; id = id ; _∘_ = _∘_ ; left-id = left-id ; right-id = right-id ; assoc = assoc } op

@@ -8,8 +8,6 @@ open import Agda.Builtin.Nat public
   renaming (Nat to ℕ)
 open import Agda.Builtin.List public
 open import Agda.Builtin.Maybe public
-open import Agda.Builtin.Unit public
-  renaming (⊤ to 𝟙; tt to ＊)
 
 Σ-syntax = Σ
 infix 2 Σ-syntax
@@ -22,9 +20,22 @@ postulate
     → ((x : A) → f x ≡ g x)
     → f ≡ g
 
+  ext' : ∀ {A : Set} {B : A → Set} {f g : (x : A) → B x}
+    → (∀ (x : A) → f x ≡ g x)
+      -----------------------
+    → f ≡ g
+
 transport : ∀ {i j} {X : UU i} (A : X → UU j) {x y : X}
           → x ≡ y → A x → A y
 transport A refl x = x
+
+data 𝟘 : UU where
+
+data 𝟘⇒ (a b : 𝟘) : UU where
+
+data 𝟙 : UU where
+  tt : 𝟙
+
 
 {-
 -- Heterogenous Equality
