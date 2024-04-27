@@ -1,75 +1,62 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-
 module Monoid where
 
 open import Base
 open import Category
 
-private variable i j k l : Level
-
-record Monoid {i} : UU (lsuc i) where
+record Monoid {i} : Set (lsuc i) where
   field
-    -- Components --
-    obj      : UU i
+    obj      : Set i
     ε        : obj 
     _⊕_      : obj → obj → obj
-
-    -- Monoidal Laws --
     left-id  : (a : obj) → ε ⊕ a ≡ a
     right-id : (a : obj) → a ≡ a ⊕ ε
     assoc    : (a b c : obj) → (a ⊕ b) ⊕ c ≡ a ⊕ (b ⊕ c)
 open Monoid
 
+private variable M : Monoid {i}
+private variable N : Monoid {j}
+private variable P : Monoid {k}
+private variable Q : Monoid {l}
+
 -- Homomorphism between Monoids --
-record MH (M : Monoid {i}) (N : Monoid {j}) : UU (i ⊔ j) where
-  constructor MH#_,_
+record Monoid-Homomorphism (M : Monoid {i}) (N : Monoid {j}) : Set (i ⊔ j) where
   field
-    -- Component --
     map  : obj M → obj N
+    comp-law : {a b : obj M} → map ((_⊕_) M a b) ≡ (_⊕_) N (map a) (map b)
+open Monoid-Homomorphism
 
-    -- Preserving Structure --
-    map-comp : {a b : obj M} → map ((_⊕_) M a b) ≡ (_⊕_) N (map a) (map b)
-open MH
+_-M→_ = Monoid-Homomorphism
 
-mh-refl : {M : Monoid {i}} → MH M M
-mh-refl = MH# →-refl , ≡-refl
+mh-refl : M -M→ M
+mh-refl = record { map = →-refl ; comp-law = ≡-refl }
 
-mh-trans : {M : Monoid {i}} {N : Monoid {j}} {P : Monoid {k}}
-  → (f : MH N P) (g : MH M N) → MH M P
+mh-trans : N -M→ P → M -M→ N → M -M→ P
 mh-trans
-  (MH# map-f , map-comp-f)
-  (MH# map-g , map-comp-g)
-  = MH# (map-f ← map-g) , (map-comp-f ≡∘ cong map-f map-comp-g)
+  record { map = map-f ; comp-law = comp-law-f}
+  record { map = map-g ; comp-law = comp-law-g}
+  = record
+  { map = map-f ←∘- map-g
+  ; comp-law = comp-law-f ∙ cong map-f comp-law-g
+  }
 
-_←mh-_ = mh-trans
+postulate
+  mh-left-id : 
+    (f : M -M→ N)
+    → mh-trans mh-refl f ≡ f
 
-mh-left-id : {M : Monoid {i}} {N : Monoid {j}}
-  → (f : MH M N)
-  → mh-refl ←mh- f ≡ f
-mh-left-id (MH# map-f , map-comp-f)
-  = {!!}
+  mh-right-id : 
+    (f : M -M→ N)
+    → f ≡ mh-trans f mh-refl
 
-mh-right-id : {M : Monoid {i}} {N : Monoid {j}}
-  → (f : MH M N)
-  → f ≡ f ←mh- mh-refl
-mh-right-id (MH# map-f , map-comp-f)
-  = {!!}
-
-mh-assoc : {l₁ l₂ l₃ l₄ : Level}
-  → {M : Monoid {l₁}} {N : Monoid {l₂}} {P : Monoid {l₃}} {Q : Monoid {l₄}}
-  → (f : MH P Q) (g : MH N P) (h : MH M N)
-  → (f ←mh- g) ←mh- h ≡ f ←mh- (g ←mh- h)
-mh-assoc
-  (MH# map-f , map-comp-f)
-  (MH# map-g , map-comp-g)
-  (MH# map-h , map-comp-h)
-  = {!!}
+  mh-assoc :
+    (f : P -M→ Q) (g : N -M→ P) (h : M -M→ N)
+    → mh-trans (mh-trans f g) h ≡ mh-trans f (mh-trans g h)
 
 MON : Category {lsuc i} {i}
-MON {i = i}
+MON {i}
   = record
   { obj = Monoid {i}
-  ; hom = MH
+  ; hom = _-M→_
   ; id  = mh-refl
   ; _∘_ = mh-trans
   ; left-id  = mh-left-id
@@ -80,7 +67,7 @@ MON {i = i}
 ℕ-+-0-monoid : Monoid
 ℕ-+-0-monoid
   = record
-  { obj = ℕ
+  { obj = Nat
   ; ε   = 0
   ; _⊕_ = _+_
   ; left-id  = +-left-id
@@ -88,10 +75,10 @@ MON {i = i}
   ; assoc    = +-assoc
   }
 
-ℕ-*-1-monoid : Monoid
-ℕ-*-1-monoid
+Nat-*-1-monoid : Monoid
+Nat-*-1-monoid
   = record
-  { obj = ℕ
+  { obj = Nat
   ; ε   = 1
   ; _⊕_ = _*_
   ; left-id  = *-left-id
@@ -99,7 +86,7 @@ MON {i = i}
   ; assoc    = *-assoc
   }
 
-free-monoid : (A : UU i) → Monoid {i}
+free-monoid : (A : Set i) → Monoid {i}
 free-monoid A
   = record
   { obj = List A
@@ -117,7 +104,7 @@ monoid-as-category
   ; left-id = left-id ; right-id = right-id ; assoc = assoc
   }
   = record
-  { obj = 𝟙
+  { obj = ⊤
   ; hom = λ _ _ → obj
   ; id  = ε
   ; _∘_ = _⊕_
@@ -125,10 +112,3 @@ monoid-as-category
   ; right-id = right-id
   ; assoc    = assoc
   }
-
-record Test : UU (lsuc i) where
-  field
-    t : UU i
-    ft : UU i → UU i → UU i
-open Test
-

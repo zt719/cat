@@ -1,79 +1,81 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-
 module Functor where
 
 open import Base
 open import Category
 open import Monoid
 
-private variable l₁ l₂ l₃ l₄ l₅ l₆ l₇ l₈ : Level
-private variable A : UU l₁
-private variable B : UU l₂
-private variable C : UU l₃
-private variable 𝓒 : Category {l₁} {l₂}
-private variable 𝓓 : Category {l₃} {l₄}
-private variable 𝓔 : Category {l₅} {l₆}
-private variable 𝓕 : Category {l₇} {l₈}
+private variable ℂ : Category {i} {j}
+private variable 𝔻 : Category {k} {l}
+private variable 𝔼 : Category {m} {n}
+private variable 𝔽 : Category {p} {q}
 
-record Functor (𝓒 : Category {l₁} {l₂} ) (𝓓 : Category {l₃} {l₄})
-  : UU (l₁ ⊔ l₂ ⊔ l₃ ⊔ l₄) where
-  constructor Functor#_,_,_,_
-  open Category.Category 𝓒 renaming (_∘_ to _∘𝓒_)
-  open Category.Category 𝓓 renaming (_∘_ to _∘𝓓_)
+record Functor (ℂ : Category {i} {j} ) (𝔻 : Category {k} {l})
+  : Set (i ⊔ j ⊔ k ⊔ l) where
+  open Category.Category
   field
-    map : obj 𝓒 → obj 𝓓
-    fmap : {a b : obj 𝓒} → hom 𝓒 a b → hom 𝓓 (map a) (map b)
+    map : obj ℂ → obj 𝔻
+    fmap : {a b : obj ℂ} → hom ℂ a b → hom 𝔻 (map a) (map b)
     
-    map-id   : {a : obj 𝓒} → fmap (id 𝓒 {a}) ≡ id 𝓓 {map a}
-    map-comp : {a b c : obj 𝓒} {f : hom 𝓒 b c} {g : hom 𝓒 a b}
-      → fmap (f ∘𝓒 g) ≡ (fmap f) ∘𝓓 (fmap g)
+    id-law   : {a : obj ℂ} → fmap (id ℂ {a}) ≡ id 𝔻 {map a}
+    trans-law : {a b c : obj ℂ} {f : hom ℂ b c} {g : hom ℂ a b}
+      → fmap ((_∘_) ℂ f g) ≡ (_∘_) 𝔻 (fmap f) (fmap g)
 open Functor
 
-Endofunctor : Category {l₁} {l₂} → UU (l₁ ⊔ l₂)
-Endofunctor 𝓒 = Functor 𝓒 𝓒
+_⇒_ = Functor
 
-func-refl : Functor 𝓒 𝓒
-func-refl = Functor# →-refl , →-refl , ≡-refl , ≡-refl
+Endofunctor : Category {i} {j} → Set (i ⊔ j)
+Endofunctor ℂ = ℂ ⇒ ℂ
 
-func-trans : Functor 𝓓 𝓔 → Functor 𝓒 𝓓 → Functor 𝓒 𝓔
+func-refl : ℂ ⇒ ℂ
+func-refl = record { map = →-refl ; fmap = →-refl ; id-law = ≡-refl ; trans-law = ≡-refl}
+
+func-trans : 𝔻 ⇒ 𝔼 → ℂ ⇒ 𝔻 → ℂ ⇒ 𝔼
 func-trans
-  (Functor# map-F , fmap-F , map-id-F , map-comp-F)
-  (Functor# map-G , fmap-G , map-id-G , map-comp-G)
+  record { map = map-F ; fmap = fmap-F ; id-law = id-law-F ; trans-law = trans-law-F }
+  record { map = map-G ; fmap = fmap-G ; id-law = id-law-G ; trans-law = trans-law-G }
   = record
-  { map  = map-F ← map-G
-  ; fmap = fmap-F ← fmap-G
-  ; map-id   = map-id-F ≡∘ cong fmap-F map-id-G
-  ; map-comp = map-comp-F ≡∘ cong fmap-F map-comp-G
+  { map  = map-F ←∘- map-G
+  ; fmap = fmap-F ←∘- fmap-G
+  ; id-law   = id-law-F ∙ cong fmap-F id-law-G
+  ; trans-law = trans-law-F ∙ cong fmap-F trans-law-G
   }
 
-_⇐_ = func-trans
+_⇐∘=_ = func-trans
 
-func-left-id :
-    (F : Functor 𝓒 𝓓)
-  → func-refl ⇐ F ≡ F
-func-left-id F
-  = {!!}
+postulate
+  func-left-id :
+    (F : ℂ ⇒ 𝔻)
+    → func-refl ⇐∘= F ≡ F
 
-func-right-id :
-    (F : Functor 𝓒 𝓓)
-  → F ⇐ func-refl ≡ F
-func-right-id F = {!!}
+  func-right-id :
+    (F : ℂ ⇒ 𝔻)
+    → F ≡ F ⇐∘= func-refl
 
-func-assoc : (F : Functor 𝓔 𝓕) (G : Functor 𝓓 𝓔) (H : Functor 𝓒 𝓓)
-  → (F ⇐ G) ⇐ H ≡ F ⇐ (G ⇐ H)
-func-assoc F G H = {!!}
+  func-assoc :
+    (F : 𝔼 ⇒ 𝔽) (G : 𝔻 ⇒ 𝔼) (H : ℂ ⇒ 𝔻)
+    → (F ⇐∘= G) ⇐∘= H ≡ F ⇐∘= (G ⇐∘= H)
 
+CAT : ∀ {i j} → Category
+CAT {i} {j} = record
+        { obj = Category {i} {j}
+        ; hom = _⇒_
+        ; id = func-refl
+        ; _∘_ = func-trans
+        ; left-id = func-left-id
+        ; right-id = func-right-id
+        ; assoc = func-assoc
+        }
 
 maybe-functor : Endofunctor SET
 maybe-functor
   = record
   { map  = Maybe
   ; fmap = maybe-fmap
-  ; map-id = ext λ{ (just a) → refl ; nothing → refl}
-  ; map-comp = ext λ { (just a) → refl ; nothing → refl}
+  ; id-law = ext λ{ (just a) → refl ; nothing → refl}
+  ; trans-law = ext λ { (just a) → refl ; nothing → refl}
   }
   where
-  maybe-fmap : (A → B) → Maybe A → Maybe B
+  maybe-fmap : ∀ {A B} → (A → B) → Maybe A → Maybe B
   maybe-fmap f (just a) = just (f a)
   maybe-fmap f nothing  = nothing
 
@@ -82,35 +84,33 @@ list-functor
   = record
   { map  = List
   ; fmap = list-fmap
-  ; map-id = ext list-map-id'
-  ; map-comp = ext list-map-comp'
+  ; id-law = ext list-id-law'
+  ; trans-law = ext list-trans-law'
   }
   where
-  list-fmap : (A → B) → List A → List B
+  list-fmap : ∀ {A B} → (A → B) → List A → List B
   list-fmap f [] = []
   list-fmap f (a ∷ as) = f a ∷ list-fmap f as
   
-  list-map-id' : (as : List A) → list-fmap →-refl as ≡ →-refl as
-  list-map-id' [] = refl
-  list-map-id' (l₇ ∷ as) = cong (→-refl l₇ ∷_) (list-map-id' as)
+  list-id-law' : ∀ {A} → (as : List A) → list-fmap →-refl as ≡ →-refl as
+  list-id-law' [] = refl
+  list-id-law' (l₇ ∷ as) = cong (→-refl l₇ ∷_) (list-id-law' as)
   
-  list-map-comp' : {f : B → C} {g : A → B}
+  list-trans-law' : ∀ {A B C} → {f : B → C} {g : A → B}
     → (as : List A)
     → list-fmap (→-trans f g) as ≡ →-trans (list-fmap f) (list-fmap g) as
-  list-map-comp' [] = refl
-  list-map-comp' {f = f} {g = g} (a ∷ as) = cong (→-trans f g a ∷_) (list-map-comp' as)
+  list-trans-law' [] = refl
+  list-trans-law' {f = f} {g = g} (a ∷ as) = cong (→-trans f g a ∷_) (list-trans-law' as)
 
-forgetful-functor : Functor MON SET
+forgetful-functor : MON ⇒ SET
 forgetful-functor = record
   { map  = Monoid.obj
-  ; fmap = MH.map
-  ; map-id   = refl
-  ; map-comp = refl
+  ; fmap = Monoid-Homomorphism.map
+  ; id-law   = refl
+  ; trans-law = refl
   }
 
 identity-functor :
-  (𝓒 : Category {l₁} {l₂})
-  → Endofunctor 𝓒
-identity-functor 𝓒 = func-refl
-
-
+  (ℂ : Category {i} {j})
+  → Endofunctor ℂ
+identity-functor ℂ = func-refl

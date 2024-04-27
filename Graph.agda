@@ -2,12 +2,12 @@ module Graph where
 
 open import Base
 
-data Point : UU where
+data Point : Set where
   a : Point
   b : Point
   c : Point
 
-data Arrow : Point → Point → UU where
+data Arrow : Point → Point → Set where
   aa : Arrow a a
   ab : Arrow a b
   ac : Arrow a c

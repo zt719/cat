@@ -4,11 +4,11 @@ module Category where
 open import Base
 open import Graph
 
-record Category {i} {j} : UU (lsuc (i ⊔ j)) where
+record Category {i} {j} : Set (lsuc (i ⊔ j)) where
   field  
     -- Components --
-    obj : UU i
-    hom : obj → obj → UU j
+    obj : Set i
+    hom : obj → obj → Set j
     id  : {a : obj} → hom a a
     _∘_ : {a b c : obj}
       → hom b c → hom a b → hom a c
@@ -23,7 +23,7 @@ open Category
 SET : Category
 SET
   = record
-  { obj = UU
+  { obj = Set
   ; hom = λ a b → (a → b)
   ; id = →-refl
   ; _∘_ = →-trans
@@ -35,7 +35,7 @@ SET
 ℕ-≤-preorder : Category
 ℕ-≤-preorder
   = record
-  { obj = ℕ
+  { obj = Nat
   ; hom = _≤_
   ; id = ≤-refl
   ; _∘_ = ≤-trans
@@ -48,8 +48,8 @@ SET
 M-+ : Category
 M-+
   = record
-  { obj = 𝟙
-  ; hom = λ _ _ → ℕ
+  { obj = ⊤
+  ; hom = λ _ _ → Nat
   ; id  = +-refl
   ; _∘_ = _+_
   ; left-id  = +-left-id
@@ -60,8 +60,8 @@ M-+
 M-* : Category
 M-*
   = record
-  { obj = 𝟙
-  ; hom = λ _ _ → ℕ
+  { obj = ⊤
+  ; hom = λ _ _ → Nat
   ; id  = *-refl
   ; _∘_ = _*_
   ; left-id  = *-left-id
@@ -71,8 +71,8 @@ M-*
 
 NONE : Category
 NONE = record
-        { obj = 𝟘
-        ; hom = 𝟘⇒
+        { obj = ⊥
+        ; hom = _-⊥→_
         ; id = λ {}
         ; _∘_ = λ _ ()
         ; left-id = λ ()
@@ -91,11 +91,11 @@ graph-as-Cat = record
                ; assoc = arrow-assoc
                }
     
-_op : {i j : Level} → Category {i} {j} → Category {i} {j}
+_op : Category {i} {j} → Category {i} {j}
 record { obj = obj ; hom = hom ; id = id ; _∘_ = _∘_ ; left-id = left-id ; right-id = right-id ; assoc = assoc } op
   = record
      { obj = obj
-     ; hom = λ a b  → hom b a
+     ; hom = λ a b → hom b a
      ; id = id
      ; _∘_ = λ f g → g ∘ f
      ; left-id = λ f → ≡-sym (right-id f)
