@@ -16,9 +16,9 @@ record Natural-Transformation {ℂ : Category {i} {j}} {𝔻 : Category {k} {l}}
   open Category.Category
   open Functor.Functor
   field
-    α : {a : obj ℂ} → hom 𝔻 (map F a) (map G a)
+    at : {a : obj ℂ} → hom 𝔻 (map F a) (map G a)
     natural : {a b : obj ℂ} {f : hom ℂ a b}
-      → (_∘_) 𝔻 (α {b}) (fmap F f) ≡ (_∘_) 𝔻 (fmap G f) (α {a})
+      → (_∘_) 𝔻 (at {b}) (fmap F f) ≡ (_∘_) 𝔻 (fmap G f) (at {a})
 open Natural-Transformation
 
 _~_ = Natural-Transformation
@@ -30,7 +30,7 @@ head (a ∷ as) = just a
 
 head-as-nt : list-functor ~ maybe-functor
 head-as-nt = record
-  { α = head
+  { at = head
   ; natural = ext (λ{ [] → refl ; (a ∷ as) → refl })
   }
 
@@ -39,7 +39,7 @@ nt-refl
   {ℂ = record { id = id ; left-id = left-id ; right-id = right-id }}
   {F = record { fmap = fmap ; trans-law = trans-law }}
   = record
-  { α = fmap id
+  { at = fmap id
   ; natural = λ
     { {f = f} → trans-law
     ∙ cong fmap (right-id f ∙ left-id f)
@@ -57,16 +57,16 @@ open Functor.Functor
 nt-trans
   {𝔻 = record { _∘_ = _∘_ ; assoc = assoc }}
   {F = F} {G = G} {H = H}
-  record { α = α ; natural = natural-α }
-  record { α = β ; natural = natural-β }
+  record { at = at ; natural = natural-at }
+  record { at = β ; natural = natural-β }
   = record
-  { α = α ∘ β
+  { at = at ∘ β
   ; natural = λ
-    { {a} {b} {f} → assoc (fmap H f) (α {a}) (β {a})
-    ∙ cong (_∘ (β {a})) natural-α
-    ∙ ≡-sym (assoc (α {b}) (fmap G f) (β {a}))
-    ∙ cong ((α {b}) ∘_) natural-β
-    ∙ assoc (α {b}) (β {b}) (fmap F f)
+    { {a} {b} {f} → assoc (fmap H f) (at {a}) (β {a})
+    ∙ cong (_∘ (β {a})) natural-at
+    ∙ ≡-sym (assoc (at {b}) (fmap G f) (β {a}))
+    ∙ cong ((at {b}) ∘_) natural-β
+    ∙ assoc (at {b}) (β {b}) (fmap F f)
     }
   }
 
@@ -74,16 +74,16 @@ _~∘~_ = nt-trans
 
 postulate
   nt-left-id :
-    (α : F ~ G)
-    → nt-refl ~∘~ α ≡ α
+    (at : F ~ G)
+    → nt-refl ~∘~ at ≡ at
     
   nt-right-id :
-    (α : F ~ G)
-    → α ≡ α ~∘~ nt-refl
+    (at : F ~ G)
+    → at ≡ at ~∘~ nt-refl
 
   nt-assoc :
-    (α : H ~ J) (β : G ~ H) (γ : F ~ G)
-    → (α ~∘~ β) ~∘~ γ ≡ α ~∘~ (β ~∘~ γ)
+    (at : H ~ J) (β : G ~ H) (γ : F ~ G)
+    → (at ~∘~ β) ~∘~ γ ≡ at ~∘~ (β ~∘~ γ)
 
 FUNC : {ℂ : Category {i} {j}} {𝔻 : Category {k} {l}} → Category
 FUNC {ℂ = ℂ} {𝔻 = 𝔻}
@@ -102,16 +102,16 @@ nt-horizontal : {F F' : ℂ ⇒ 𝔻} {G G' : 𝔻 ⇒ 𝔼}
 nt-horizontal
   {𝔼 = record { _∘_ = _∘_ ; assoc = assoc }}
   {F} {F'} {G} {G'}
-  record { α = β ; natural = natural-β }
-  record { α = α ; natural = natural-α }
+  record { at = β ; natural = natural-β }
+  record { at = at ; natural = natural-at }
   = record
-  { α = fmap G' α ∘ β 
+  { at = fmap G' at ∘ β 
   ; natural = λ
-    { {a} {b} {f} → assoc (fmap (G' ⇐∘= F') f) (fmap G' (α {a})) (β {map F a})
-    ∙ cong (_∘ β {map F a}) (trans-law G' ∙ cong (fmap G') natural-α ∙ ≡-sym (trans-law G'))
-    ∙ ≡-sym (assoc (fmap G' (α {b})) (fmap (G' ⇐∘= F) f) (β {map F a}))
-    ∙ cong (fmap G' (α {b}) ∘_) (natural-β {map F a} {map F b} {fmap F f})
-    ∙ assoc (fmap G' (α {b})) (β {map F b}) (fmap (G ⇐∘= F) f)
+    { {a} {b} {f} → assoc (fmap (G' ⇐∘= F') f) (fmap G' (at {a})) (β {map F a})
+    ∙ cong (_∘ β {map F a}) (trans-law G' ∙ cong (fmap G') natural-at ∙ ≡-sym (trans-law G'))
+    ∙ ≡-sym (assoc (fmap G' (at {b})) (fmap (G' ⇐∘= F) f) (β {map F a}))
+    ∙ cong (fmap G' (at {b}) ∘_) (natural-β {map F a} {map F b} {fmap F f})
+    ∙ assoc (fmap G' (at {b})) (β {map F b}) (fmap (G ⇐∘= F) f)
     }
   }
 
@@ -127,8 +127,8 @@ _~hl_ = nt-func-horizontal
 
 func-nt-horizontal : {F F' : ℂ ⇒ 𝔻}
   → (G : 𝔻 ⇒ 𝔼)
-  → (α : F ~ F')
+  → (at : F ~ F')
   → (G ⇐∘= F) ~ (G ⇐∘= F')
-func-nt-horizontal G α = id-nt G ~h α
+func-nt-horizontal G at = id-nt G ~h at
 
 _~hr_ = nt-func-horizontal
