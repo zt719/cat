@@ -255,3 +255,7 @@ _++_ : ∀ {i} {A : UU i}
   → (xs ++ ys) ++ zs ≡ xs ++ (ys ++ zs)
 ++-assoc []       ys zs = refl
 ++-assoc (x ∷ xs) ys zs = cong (x ∷_) (++-assoc xs ys zs)
+
+data Fin : ℕ → UU where
+  ★ : (k : ℕ) → Fin (suc k)
+  i : (k : ℕ) → Fin k → Fin (suc k)
