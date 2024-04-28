@@ -102,3 +102,15 @@ record { obj = obj ; hom = hom ; id = id ; _∘_ = _∘_ ; left-id = left-id ; r
      ; right-id = λ f → ≡-sym (left-id f)
      ; assoc = λ f g h → ≡-sym (assoc h g f)
      }
+
+FIN : Nat → Category
+FIN k
+  = record
+     { obj = Fin k
+     ; hom = Fin⇒ k
+     ; id = Fin⇒-refl k
+     ; _∘_ = Fin⇒-trans k
+     ; left-id = Fin⇒-left-id k
+     ; right-id = Fin⇒-right-id k
+     ; assoc = Fin⇒-assoc k
+     }

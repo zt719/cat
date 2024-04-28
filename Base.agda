@@ -212,8 +212,35 @@ _++_ : ∀ {i} {A : Set i}
 ++-assoc []       ys zs = refl
 ++-assoc (x ∷ xs) ys zs = cong (x ∷_) (++-assoc xs ys zs)
 
-{-
 data Fin : Nat → Set where
   ★ : (k : Nat) → Fin (suc k)
-  i : (k : Nat) → Fin k → Fin (suc k)
--}
+  𝓲 : (k : Nat) → Fin k → Fin (suc k)
+
+data Fin⇒ : (k : Nat) (a b : Fin k) → Set where
+  id⇒ : (k : Nat) {a : Fin k} → Fin⇒ k a a
+
+Fin⇒-refl : (k : Nat) {a : Fin k}
+  → Fin⇒ k a a
+Fin⇒-refl k = id⇒ k
+
+Fin⇒-trans : (k : Nat) {a b c : Fin k}
+  → Fin⇒ k b c → Fin⇒ k a b → Fin⇒ k a c
+Fin⇒-trans k (id⇒ .k) (id⇒ .k) = id⇒ k
+
+Fin⇒-left-id : (k : Nat) {a b : Fin k}
+  → (f : Fin⇒ k a b)
+  → Fin⇒-trans k (Fin⇒-refl k) f ≡ f
+Fin⇒-left-id k (id⇒ .k) = refl
+
+Fin⇒-right-id : (k : Nat) {a b : Fin k}
+  → (f : Fin⇒ k a b)
+  → f ≡ Fin⇒-trans k f (Fin⇒-refl k)
+Fin⇒-right-id k (id⇒ .k) = refl
+
+Fin⇒-assoc : (k : Nat) {a b c d : Fin k}
+  → (f : Fin⇒ k c d)
+  → (g : Fin⇒ k b c)
+  → (h : Fin⇒ k a b)
+  → Fin⇒-trans k (Fin⇒-trans k f g) h ≡ Fin⇒-trans k f (Fin⇒-trans k g h)
+Fin⇒-assoc k (id⇒ .k) (id⇒ .k) (id⇒ .k) = refl
+
