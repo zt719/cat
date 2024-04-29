@@ -1,9 +1,11 @@
-module Monad where
+module Category.Monad where
 
-open import Base
-open import Category
-open import Functor
-open import Natural-Transformation
+open import Agda.Primitive
+open import Category.Category
+open import Category.Functor
+open import Category.Natural-Transformation
+
+private variable i j : Level
 
 -- TODO : Add commutative diagrams
 record Monad (ℂ : Category {i} {j}) : Set (i ⊔ j) where

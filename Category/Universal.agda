@@ -1,18 +1,22 @@
-module Universal where
+module Category.Universal where
 
-open import Base
-open import Category
+open import Agda.Primitive
+open import Data.Equality
+open import Data.Nat
+open import Data.Empty
+open import Category.Category
 
+private variable i j : Level
 
 -- TODO : Add uniqueness
 record Initial (ℂ : Category {i} {j}) : Set (i ⊔ j) where
-  open Category.Category ℂ
+  open Category.Category.Category ℂ
   field
     φ : obj
     absurd : (a : obj) → hom φ a
 open Initial
 
-0-as-initial-preorder : Initial ℕ-≤-preorder
+0-as-initial-preorder : Initial PREORDER
 0-as-initial-preorder
   = record { φ = zero ; absurd = λ n → z≤n }
 
@@ -20,13 +24,13 @@ open Initial
 𝟘-as-initial-SET = record { φ = ⊥ ; absurd = λ a () }
 
 record Terminal (ℂ : Category {i} {j}) : Set (i ⊔ j) where
-  open Category.Category ℂ
+  open Category.Category.Category ℂ
   field
     ＊ : obj
     unit : (a : obj) → hom a ＊
 open Terminal
 
-0-as-terminal-preorder-op : Terminal (ℕ-≤-preorder op)
+0-as-terminal-preorder-op : Terminal (PREORDER op)
 0-as-terminal-preorder-op = record { ＊ = 0 ; unit = λ n → z≤n }
 
 𝟘-as-terminal-SET-op : Terminal (SET op)
@@ -34,7 +38,7 @@ open Terminal
 
 record Isomorphism {ℂ : Category {i} {j}}
   (a b : Category.obj ℂ) : Set (i ⊔ j) where
-  open Category.Category ℂ
+  open Category.Category.Category ℂ
   field
     to : hom a b
     from : hom b a
@@ -47,7 +51,7 @@ _≅_ = Isomorphism
 record Product {ℂ : Category {i} {j}}
   (a b : Category.obj ℂ) : Set (i ⊔ j) where
   constructor _ẋ_
-  open Category.Category ℂ
+  open Category.Category.Category ℂ
   field
     product : obj
     fst : hom product a
@@ -57,7 +61,7 @@ open Product
 record Coproduct {ℂ : Category {i} {j}}
   (a b : Category.obj ℂ) : Set (i ⊔ j) where
   constructor _∔_
-  open Category.Category ℂ
+  open Category.Category.Category ℂ
   field
     coproduct : obj
     inj₁ : hom a coproduct

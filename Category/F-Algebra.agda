@@ -1,33 +1,36 @@
-module F-Algebra where
+module Category.F-Algebra where
 
-open import Base
-open import Category
-open import Functor
-open import Universal
+open import Agda.Primitive
+open import Data.Equality
+open import Data.Nat
+open import Data.Maybe
+open import Category.Category
+open import Category.Functor
+open import Category.Universal
 
--- F-Algebra --
+private variable i j : Level
+
 record F-Alg (ℂ : Category {i} {j}) (F : Endofunctor ℂ) : Set (i ⊔ j) where
-  open Category.Category ℂ
-  open Functor.Functor
+  open Category.Category.Category ℂ
+  open Category.Functor.Functor
   field
     carrier : obj
     eval    : hom (map F carrier) carrier
 open F-Alg
 
--- Homomorphsim between F-Algebra
 record F-Alg⇒ {ℂ : Category {i} {j}} {F : Endofunctor ℂ}
   (Aα : F-Alg ℂ F) (Bβ : F-Alg ℂ F) : Set (i ⊔ j) where
-  open Category.Category ℂ
-  open Functor.Functor
+  open Category.Category.Category ℂ
+  open Category.Functor.Functor F
   open F-Alg Aα renaming (carrier to A; eval to α)
   open F-Alg Bβ renaming (carrier to B; eval to β)
   field
     f : hom A B
-    f-law : f ∘ α ≡ β ∘ fmap F f
+    f-law : f ∘ α ≡ β ∘ fmap f
 open F-Alg⇒
 
-NatF : F-Alg SET maybe-functor
-NatF = record { carrier = Nat ; eval = λ{ (just x) → suc x ; nothing → zero } }
+ℕF : F-Alg SET maybe-functor
+ℕF = record { carrier = ℕ ; eval = λ{ (just x) → suc x ; nothing → zero } }
 
 F-Alg⇒-refl : {ℂ : Category {i} {j}} {F : Endofunctor ℂ} {alg : F-Alg ℂ F} → F-Alg⇒ alg alg
 F-Alg⇒-refl
@@ -38,7 +41,7 @@ F-Alg⇒-refl
 
 F-Alg⇒-trans : {ℂ : Category {i} {j}} {F : Endofunctor ℂ} {alg1 alg2 alg3 : F-Alg ℂ F }
   → F-Alg⇒ alg2 alg3 → F-Alg⇒ alg1 alg2 → F-Alg⇒ alg1 alg3
-open Functor.Functor
+open Category.Functor.Functor
 F-Alg⇒-trans
   {ℂ = record { _∘_ = _∘_ ; assoc = assoc }}
   {F = F}

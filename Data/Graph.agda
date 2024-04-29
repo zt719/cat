@@ -1,6 +1,6 @@
-module Graph where
+module Data.Graph where
 
-open import Base
+open import Data.Equality
 
 data Point : Set where
   a : Point

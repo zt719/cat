@@ -1,14 +1,16 @@
-module Limit where
+module Category.Limit where
 
-open import Base
-open import Category
-open import Functor
-open import Natural-Transformation
+open import Agda.Primitive
+open import Data.Equality
+open import Category.Category
+open import Category.Functor
+open import Category.Natural-Transformation
 
-open Category.Category
-open Functor.Functor
-open Natural-Transformation.Natural-Transformation
+open Category.Category.Category
+open Category.Functor.Functor
+open Category.Natural-Transformation.Natural-Transformation
 
+private variable i j k l : Level
 private variable 𝕀 : Category {i} {j}
 private variable ℂ : Category {k} {l}
 private variable D : 𝕀 ⇒ ℂ
@@ -49,8 +51,8 @@ record Limit {𝕀 : Category {i} {j}} (ℂ : Category {k} {l}) {D : 𝕀 ⇒ �
       → (_∘_) ℂ (at (sides limit) {a}) arr ≡ at (sides cone) {a}
 open Limit
 
-terminal-form-by-limit : (ℂ : Category {i} {j}) (c : obj ℂ) {D : NONE ⇒ ℂ}
-  → Limit {𝕀 = NONE} ℂ {D} 
+terminal-form-by-limit : (ℂ : Category {i} {j}) (c : obj ℂ) {D : EMPTY ⇒ ℂ}
+  → Limit {𝕀 = EMPTY} ℂ {D} 
 terminal-form-by-limit ℂ c
   = record
   { limit = record { apex = c ; sides = record { at = λ {} ; natural = λ {} } ; triangle = λ () }

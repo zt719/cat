@@ -1,9 +1,13 @@
-module Natural-Transformation where
+module Category.Natural-Transformation where
 
-open import Base
-open import Category
-open import Functor
+open import Agda.Primitive
+open import Data.Equality
+open import Data.Maybe
+open import Data.List
+open import Category.Category
+open import Category.Functor
 
+private variable i j k l m n p q : Level
 private variable ℂ : Category {i} {j}
 private variable 𝔻 : Category {k} {l}
 private variable 𝔼 : Category {m} {n}
@@ -13,8 +17,8 @@ private variable F G H J : ℂ ⇒ 𝔻
 
 record Natural-Transformation {ℂ : Category {i} {j}} {𝔻 : Category {k} {l}}
   (F G : ℂ ⇒ 𝔻) : Set (i ⊔ j ⊔ k ⊔ l) where
-  open Category.Category
-  open Functor.Functor
+  open Category.Category.Category
+  open Category.Functor.Functor
   field
     at : {a : obj ℂ} → hom 𝔻 (map F a) (map G a)
     natural : {a b : obj ℂ} {f : hom ℂ a b}
@@ -52,8 +56,8 @@ id-nt F = nt-refl
 
 nt-trans : {F G H : ℂ ⇒ 𝔻}
   → G ~ H → F ~ G → F ~ H
-open Category.Category
-open Functor.Functor
+open Category.Category.Category
+open Category.Functor.Functor
 nt-trans
   {𝔻 = record { _∘_ = _∘_ ; assoc = assoc }}
   {F = F} {G = G} {H = H}

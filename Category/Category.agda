@@ -1,10 +1,18 @@
-module Category where
+module Category.Category where
 
-open import Base
-open import Graph
+open import Agda.Primitive
+open import Data.Equality
+open import Data.Function
+open import Data.Nat
+open import Data.Unit
+open import Data.Empty
+open import Data.Fin
+open import Data.Graph
 
-record Category {i} {j} : Set (lsuc (i ⊔ j)) where
-  field  
+private variable i j : Level
+
+record Category : Set (lsuc (i ⊔ j)) where
+  field
     -- Components --
     obj : Set i
     hom : obj → obj → Set j
@@ -31,10 +39,10 @@ SET
   ; assoc = →-assoc
   }
 
-ℕ-≤-preorder : Category
-ℕ-≤-preorder
+PREORDER : Category
+PREORDER
   = record
-  { obj = Nat
+  { obj = ℕ
   ; hom = _≤_
   ; id = ≤-refl
   ; _∘_ = ≤-trans
@@ -44,11 +52,11 @@ SET
   }
 
 -- Monoids as Categories
-M-+ : Category
-M-+
+M+ : Category
+M+
   = record
   { obj = ⊤
-  ; hom = λ _ _ → Nat
+  ; hom = λ _ _ → ℕ
   ; id  = +-refl
   ; _∘_ = _+_
   ; left-id  = +-left-id
@@ -56,11 +64,11 @@ M-+
   ; assoc    = +-assoc
   }
 
-M-* : Category
-M-*
+M* : Category
+M*
   = record
   { obj = ⊤
-  ; hom = λ _ _ → Nat
+  ; hom = λ _ _ → ℕ
   ; id  = *-refl
   ; _∘_ = _*_
   ; left-id  = *-left-id
@@ -68,10 +76,10 @@ M-*
   ; assoc    = *-assoc
   }
 
-NONE : Category
-NONE = record
+EMPTY : Category
+EMPTY = record
         { obj = ⊥
-        ; hom = _-⊥→_
+        ; hom = _⊥⇒_
         ; id = λ {}
         ; _∘_ = λ _ ()
         ; left-id = λ ()
@@ -79,8 +87,8 @@ NONE = record
         ; assoc = λ _ _ ()
         }
 
-graph-as-Cat : Category
-graph-as-Cat = record
+GRAPH : Category
+GRAPH = record
                { obj = Point
                ; hom = Arrow
                ; id = arrow-refl
@@ -102,7 +110,7 @@ record { obj = obj ; hom = hom ; id = id ; _∘_ = _∘_ ; left-id = left-id ; r
      ; assoc = λ f g h → ≡-sym (assoc h g f)
      }
 
-FIN : Nat → Category
+FIN : ℕ → Category
 FIN k
   = record
      { obj = Fin k

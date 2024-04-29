@@ -1,9 +1,16 @@
-module Monoid where
+module Category.Monoid where
 
-open import Base
-open import Category
+open import Agda.Primitive
+open import Data.Equality
+open import Data.Function
+open import Data.Nat
+open import Data.List
+open import Data.Unit
+open import Category.Category
 
-record Monoid {i} : Set (lsuc i) where
+private variable i j k l : Level
+
+record Monoid : Set (lsuc i) where
   field
     obj      : Set i
     ε        : obj 
@@ -18,7 +25,6 @@ private variable N : Monoid {j}
 private variable P : Monoid {k}
 private variable Q : Monoid {l}
 
--- Homomorphism between Monoids --
 record Monoid-Homomorphism (M : Monoid {i}) (N : Monoid {j}) : Set (i ⊔ j) where
   field
     map  : obj M → obj N
@@ -64,10 +70,10 @@ MON {i}
   ; assoc    = mh-assoc
   }
       
-ℕ-+-0-monoid : Monoid
-ℕ-+-0-monoid
+ℕ-+ : Monoid
+ℕ-+
   = record
-  { obj = Nat
+  { obj = ℕ
   ; ε   = 0
   ; _⊕_ = _+_
   ; left-id  = +-left-id
@@ -75,10 +81,10 @@ MON {i}
   ; assoc    = +-assoc
   }
 
-Nat-*-1-monoid : Monoid
-Nat-*-1-monoid
+ℕ-* : Monoid
+ℕ-*
   = record
-  { obj = Nat
+  { obj = ℕ
   ; ε   = 1
   ; _⊕_ = _*_
   ; left-id  = *-left-id
@@ -86,8 +92,8 @@ Nat-*-1-monoid
   ; assoc    = *-assoc
   }
 
-free-monoid : (A : Set i) → Monoid {i}
-free-monoid A
+free : Set i → Monoid {i}
+free A
   = record
   { obj = List A
   ; ε   = []
@@ -97,8 +103,8 @@ free-monoid A
   ; assoc    = ++-assoc
   }
   
-monoid-as-category : Monoid {i} → Category
-monoid-as-category
+MONOID : Monoid {i} → Category
+MONOID
   record
   { obj = obj ; ε = ε ; _⊕_ = _⊕_
   ; left-id = left-id ; right-id = right-id ; assoc = assoc

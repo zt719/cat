@@ -1,9 +1,14 @@
-module Functor where
+module Category.Functor where
 
-open import Base
-open import Category
-open import Monoid
+open import Agda.Primitive
+open import Data.Equality
+open import Data.Function
+open import Data.Maybe
+open import Data.List
+open import Category.Category
+open import Category.Monoid
 
+private variable i j k l m n p q : Level
 private variable ℂ : Category {i} {j}
 private variable 𝔻 : Category {k} {l}
 private variable 𝔼 : Category {m} {n}
@@ -11,7 +16,7 @@ private variable 𝔽 : Category {p} {q}
 
 record Functor (ℂ : Category {i} {j} ) (𝔻 : Category {k} {l})
   : Set (i ⊔ j ⊔ k ⊔ l) where
-  open Category.Category
+  open Category.Category.Category
   field
     map : obj ℂ → obj 𝔻
     fmap : {a b : obj ℂ} → hom ℂ a b → hom 𝔻 (map a) (map b)
