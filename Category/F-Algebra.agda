@@ -12,21 +12,21 @@ private variable i j : Level
 
 record F-Alg (ℂ : Category {i} {j}) (F : Endofunctor ℂ) : Set (i ⊔ j) where
   open Category.Category.Category ℂ
-  open Category.Functor.Functor
+  open Category.Functor.Functor F renaming (map₀ to F₀)
   field
     carrier : obj
-    eval    : hom (map F carrier) carrier
+    eval    : hom (F₀ carrier) carrier
 open F-Alg
 
 record F-Alg⇒ {ℂ : Category {i} {j}} {F : Endofunctor ℂ}
   (Aα : F-Alg ℂ F) (Bβ : F-Alg ℂ F) : Set (i ⊔ j) where
-  open Category.Category.Category ℂ
-  open Category.Functor.Functor F
+  open Category.Category.Category ℂ using (hom; _∘_)
+  open Category.Functor.Functor F renaming (map₁ to F₁)
   open F-Alg Aα renaming (carrier to A; eval to α)
   open F-Alg Bβ renaming (carrier to B; eval to β)
   field
     f : hom A B
-    f-law : f ∘ α ≡ β ∘ fmap f
+    commute : f ∘ α ≡ β ∘ F₁ f
 open F-Alg⇒
 
 ℕF : F-Alg SET maybe-functor
@@ -35,28 +35,27 @@ open F-Alg⇒
 F-Alg⇒-refl : {ℂ : Category {i} {j}} {F : Endofunctor ℂ} {alg : F-Alg ℂ F} → F-Alg⇒ alg alg
 F-Alg⇒-refl
   {ℂ = record { id = id ; _∘_ = _∘_ ; left-id = left-id ; right-id = right-id  }}
-  {F = record { id-law = id-law }}
-  {alg = record { eval = eval }}
-    = record { f = id ; f-law = cong (eval ∘_) (≡-sym id-law) ∙ right-id eval ∙ left-id eval }
+  {F = record { map-id = map-id }}
+  {alg = record { eval = α }}
+    = record { f = id ; commute = cong (α ∘_) (≡-sym map-id) ∙ right-id α ∙ left-id α }
 
 F-Alg⇒-trans : {ℂ : Category {i} {j}} {F : Endofunctor ℂ} {alg1 alg2 alg3 : F-Alg ℂ F }
   → F-Alg⇒ alg2 alg3 → F-Alg⇒ alg1 alg2 → F-Alg⇒ alg1 alg3
-open Category.Functor.Functor
 F-Alg⇒-trans
   {ℂ = record { _∘_ = _∘_ ; assoc = assoc }}
-  {F = F}
+  {F = record { map₁ = F₁ ; map-∘ = map-∘}}
   {alg1 = record { eval = α}}
   {alg2 = record { eval = β}}
   {alg3 = record { eval = γ}}
-  record { f = f ; f-law = f-law }
-  record { f = g ; f-law = g-law }
+  record { f = f ; commute = commute-f }
+  record { f = g ; commute = commute-g }
   = record
   { f = f ∘ g
-  ; f-law = cong (γ ∘_) (≡-sym (trans-law F))
-    ∙ assoc γ (fmap F f) (fmap F g)
-    ∙ cong (_∘ fmap F g) f-law
-    ∙ ≡-sym (assoc f β (fmap F g))
-    ∙ cong (f ∘_) g-law
+  ; commute = cong (γ ∘_) (≡-sym (map-∘))
+    ∙ assoc γ (F₁ f) (F₁ g)
+    ∙ cong (_∘ F₁ g) commute-f
+    ∙ ≡-sym (assoc f β (F₁ g))
+    ∙ cong (f ∘_) commute-g
     ∙ assoc f g α
   }
 
@@ -75,16 +74,17 @@ postulate
     → (alg⇒3 : F-Alg⇒ alg1 alg2)    
     → F-Alg⇒-trans (F-Alg⇒-trans alg⇒1 alg⇒2) alg⇒3 ≡ F-Alg⇒-trans alg⇒1 (F-Alg⇒-trans alg⇒2 alg⇒3)
 
-F-Alg-Cat : {ℂ : Category {i} {j}} {F : Endofunctor ℂ} → Category {i ⊔ j} {i ⊔ j}
-F-Alg-Cat {ℂ = ℂ} {F = F} = record
-             { obj = F-Alg ℂ F
-             ; hom = F-Alg⇒
-             ; id = F-Alg⇒-refl
-             ; _∘_ = F-Alg⇒-trans
-             ; left-id = F-Alg⇒-left-id
-             ; right-id = F-Alg⇒-right-id
-             ; assoc = F-Alg⇒-assoc
-             }
+F-ALG : {ℂ : Category {i} {j}} {F : Endofunctor ℂ} → Category {i ⊔ j} {i ⊔ j}
+F-ALG {ℂ = ℂ} {F = F}
+  = record
+  { obj = F-Alg ℂ F
+  ; hom = F-Alg⇒
+  ; id = F-Alg⇒-refl
+  ; _∘_ = F-Alg⇒-trans
+  ; left-id = F-Alg⇒-left-id
+  ; right-id = F-Alg⇒-right-id
+  ; assoc = F-Alg⇒-assoc
+  }
 
 {-
 Lambek : {ℂ : Category {i} {j}} {F : Endofunctor ℂ}

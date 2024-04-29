@@ -12,5 +12,5 @@ record Monad (ℂ : Category {i} {j}) : Set (i ⊔ j) where
   field
     T : Endofunctor ℂ
     η : (identity-functor ℂ) ~ T
-    μ : (T ⇐∘= T) ~ T
+    μ : (T ⇒∘ T) ~ T
 open Monad    

@@ -26,9 +26,12 @@ private variable P : Monoid {k}
 private variable Q : Monoid {l}
 
 record Monoid-Homomorphism (M : Monoid {i}) (N : Monoid {j}) : Set (i ⊔ j) where
+  open Monoid M renaming (_⊕_ to _⊝_)
+  open Monoid N renaming (_⊕_ to _⊛_)
   field
     map  : obj M → obj N
-    comp-law : {a b : obj M} → map ((_⊕_) M a b) ≡ (_⊕_) N (map a) (map b)
+    comp-law : {a b : obj M}
+      → map (a ⊝ b) ≡ map a ⊛ map b
 open Monoid-Homomorphism
 
 _-M→_ = Monoid-Homomorphism
@@ -41,7 +44,7 @@ mh-trans
   record { map = map-f ; comp-law = comp-law-f}
   record { map = map-g ; comp-law = comp-law-g}
   = record
-  { map = map-f ←∘- map-g
+  { map = map-f →∘ map-g
   ; comp-law = comp-law-f ∙ cong map-f comp-law-g
   }
 

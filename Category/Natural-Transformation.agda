@@ -4,6 +4,7 @@ open import Agda.Primitive
 open import Data.Equality
 open import Data.Maybe
 open import Data.List
+open import Data.Function 
 open import Category.Category
 open import Category.Functor
 
@@ -17,12 +18,14 @@ private variable F G H J : ℂ ⇒ 𝔻
 
 record Natural-Transformation {ℂ : Category {i} {j}} {𝔻 : Category {k} {l}}
   (F G : ℂ ⇒ 𝔻) : Set (i ⊔ j ⊔ k ⊔ l) where
-  open Category.Category.Category
-  open Category.Functor.Functor
+  open Category.Category.Category using (obj; hom)
+  open Category.Category.Category 𝔻 using (_∘_)
+  open Category.Functor.Functor F renaming (map₀ to F₀; map₁ to F₁)
+  open Category.Functor.Functor G renaming (map₀ to G₀; map₁ to G₁)  
   field
-    at : {a : obj ℂ} → hom 𝔻 (map F a) (map G a)
-    natural : {a b : obj ℂ} {f : hom ℂ a b}
-      → (_∘_) 𝔻 (at {b}) (fmap F f) ≡ (_∘_) 𝔻 (fmap G f) (at {a})
+    component : {a : obj ℂ} → hom 𝔻 (F₀ a) (G₀ a)
+    commute : {a b : obj ℂ} {f : hom ℂ a b}
+      → (component {b}) ∘ (F₁ f) ≡ (G₁ f) ∘ (component {a})
 open Natural-Transformation
 
 _~_ = Natural-Transformation
@@ -34,20 +37,20 @@ head (a ∷ as) = just a
 
 head-as-nt : list-functor ~ maybe-functor
 head-as-nt = record
-  { at = head
-  ; natural = ext (λ{ [] → refl ; (a ∷ as) → refl })
+  { component = head
+  ; commute = ext (λ{ [] → refl ; (a ∷ as) → refl })
   }
 
 nt-refl : {F : ℂ ⇒ 𝔻} → F ~ F
 nt-refl
   {ℂ = record { id = id ; left-id = left-id ; right-id = right-id }}
-  {F = record { fmap = fmap ; trans-law = trans-law }}
+  {F = record { map₁ = map₁ ; map-∘ = map-∘ }}
   = record
-  { at = fmap id
-  ; natural = λ
-    { {f = f} → trans-law
-    ∙ cong fmap (right-id f ∙ left-id f)
-    ∙ ≡-sym trans-law
+  { component = map₁ id
+  ; commute = λ
+    { {f = f} → map-∘
+    ∙ cong map₁ (right-id f ∙ left-id f)
+    ∙ ≡-sym map-∘
     }
   }
 
@@ -56,21 +59,21 @@ id-nt F = nt-refl
 
 nt-trans : {F G H : ℂ ⇒ 𝔻}
   → G ~ H → F ~ G → F ~ H
-open Category.Category.Category
-open Category.Functor.Functor
 nt-trans
   {𝔻 = record { _∘_ = _∘_ ; assoc = assoc }}
-  {F = F} {G = G} {H = H}
-  record { at = at ; natural = natural-at }
-  record { at = β ; natural = natural-β }
+  {F = record { map₁ = F₁ }}
+  {G = record { map₁ = G₁ }}
+  {H = record { map₁ = H₁ }}  
+  record { component = α ; commute = commute-α }
+  record { component = β ; commute = commute-β }
   = record
-  { at = at ∘ β
-  ; natural = λ
-    { {a} {b} {f} → assoc (fmap H f) (at {a}) (β {a})
-    ∙ cong (_∘ (β {a})) natural-at
-    ∙ ≡-sym (assoc (at {b}) (fmap G f) (β {a}))
-    ∙ cong ((at {b}) ∘_) natural-β
-    ∙ assoc (at {b}) (β {b}) (fmap F f)
+  { component = α ∘ β
+  ; commute = λ
+    { {a} {b} {f} → assoc (H₁ f) (α {a}) (β {a})
+    ∙ cong (_∘ (β {a})) commute-α
+    ∙ ≡-sym (assoc (α {b}) (G₁ f) (β {a}))
+    ∙ cong ((α {b}) ∘_) commute-β
+    ∙ assoc (α {b}) (β {b}) (F₁ f)
     }
   }
 
@@ -101,23 +104,9 @@ FUNC {ℂ = ℂ} {𝔻 = 𝔻}
   ; assoc = nt-assoc
   }
 
-nt-horizontal : {F F' : ℂ ⇒ 𝔻} {G G' : 𝔻 ⇒ 𝔼}
-  → G ~ G' → F ~ F' → (G ⇐∘= F) ~ (G' ⇐∘= F')
-nt-horizontal
-  {𝔼 = record { _∘_ = _∘_ ; assoc = assoc }}
-  {F} {F'} {G} {G'}
-  record { at = β ; natural = natural-β }
-  record { at = at ; natural = natural-at }
-  = record
-  { at = fmap G' at ∘ β 
-  ; natural = λ
-    { {a} {b} {f} → assoc (fmap (G' ⇐∘= F') f) (fmap G' (at {a})) (β {map F a})
-    ∙ cong (_∘ β {map F a}) (trans-law G' ∙ cong (fmap G') natural-at ∙ ≡-sym (trans-law G'))
-    ∙ ≡-sym (assoc (fmap G' (at {b})) (fmap (G' ⇐∘= F) f) (β {map F a}))
-    ∙ cong (fmap G' (at {b}) ∘_) (natural-β {map F a} {map F b} {fmap F f})
-    ∙ assoc (fmap G' (at {b})) (β {map F b}) (fmap (G ⇐∘= F) f)
-    }
-  }
+
+
+{-
 
 _~h_ = nt-horizontal
 
@@ -136,3 +125,51 @@ func-nt-horizontal : {F F' : ℂ ⇒ 𝔻}
 func-nt-horizontal G at = id-nt G ~h at
 
 _~hr_ = nt-func-horizontal
+-}
+
+{-
+nt-horizontal : {F G : ℂ ⇒ 𝔻} {H J : 𝔻 ⇒ 𝔼}
+  → H ~ J
+  → F ~ G
+  → (H ⇐∘= F) ~ (J ⇐∘= G)
+nt-horizontal
+  {𝔼 = record { _∘_ = _∘_ ; assoc = assoc }}
+  {F = record { map₀ = F₀ ; map₁ = F₁ }}
+  {G = record { map₀ = G₀ ; map₁ = G₁ }}
+  {H = record { map₀ = H₀ ; map₁ = H₁ }}
+  {J = record { map₀ = J₀ ; map₁ = J₁ }}  
+  record { at = β ; commute = commute-β }
+  record { at = α ; commute = commute-α }
+  = record
+  { at = H₁ α ∘ β 
+  ; commute = λ
+    { {a} {b} {f} → assoc (map₁ (J ⇐∘= G) f) (map₁ J (at {a})) (β {map₀ F a})
+    ∙ cong (_∘ β {map₀ F a}) (map-∘ J ∙ cong (map₁ J) commute-at ∙ ≡-sym (map-∘ J))
+    ∙ ≡-sym (assoc (map₁ J (at {b})) (map₁ (J ⇐∘= F) f) (β {map₀ F a}))
+    ∙ cong (map₁ J (at {b}) ∘_) (commute-β {map₀ F a} {map₀ F b} {map₁ F f})
+    ∙ assoc (map₁ J (at {b})) (β {map₀ F b}) (map₁ (H ⇐∘= F) f)
+    }
+
+  }
+-}
+
+nt-horizontal : {F G : ℂ ⇒ 𝔻} {H J : 𝔻 ⇒ 𝔼}
+  → H ~ J → F ~ G → (H ⇒∘ F) ~ (J ⇒∘ G)
+nt-horizontal
+  {𝔼 = record { _∘_ = _∘_ ; assoc = assoc }}
+  {F = record { map₀ = F₀ ; map₁ = F₁ }}
+  {G = record { map₁ = G₁ }}
+  {H = record { map₁ = H₁ }}
+  {J = record { map₁ = J₁ ; map-∘ = map-∘ }}  
+  record { component = β ; commute = commute-β }
+  record { component = α ; commute = commute-α }
+  = record
+  { component = J₁ α ∘ β 
+  ; commute = λ
+    { {a} {b} {f} → assoc ((J₁ →∘ G₁) f) (J₁ (α {a})) (β {F₀ a})
+    ∙ cong (_∘ β {F₀ a}) (map-∘ ∙ cong J₁ commute-α ∙ ≡-sym map-∘)
+    ∙ ≡-sym (assoc (J₁ (α {b})) ((J₁ →∘ F₁) f) (β {F₀ a}))
+    ∙ cong (J₁ (α {b}) ∘_) (commute-β {F₀ a} {F₀ b} {F₁ f})
+    ∙ assoc (J₁ (α {b})) (β {F₀ b}) ((H₁ →∘ F₁) f)
+    }
+  }
