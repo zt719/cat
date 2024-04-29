@@ -213,8 +213,8 @@ _++_ : ∀ {i} {A : Set i}
 ++-assoc (x ∷ xs) ys zs = cong (x ∷_) (++-assoc xs ys zs)
 
 data Fin : Nat → Set where
-  ★ : (k : Nat) → Fin (suc k)
-  𝓲 : (k : Nat) → Fin k → Fin (suc k)
+  ★ : {k : Nat} → Fin (suc k)
+  𝓲 : {k : Nat} → Fin k → Fin (suc k)
 
 data Fin⇒ : (k : Nat) (a b : Fin k) → Set where
   id⇒ : (k : Nat) {a : Fin k} → Fin⇒ k a a

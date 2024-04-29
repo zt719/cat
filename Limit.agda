@@ -56,3 +56,18 @@ terminal-form-by-limit ℂ c
   { limit = record { apex = c ; sides = record { at = λ {} ; natural = λ {} } ; triangle = λ () }
   ; arr = λ {}
   }
+
+{-
+product-by-limit : (ℂ : Category {i} {j}) (c : obj ℂ) {D : FIN 2 ⇒ ℂ}
+  → Limit {𝕀 = FIN 2} ℂ {D}
+product-by-limit ℂ c
+  = record
+  { limit
+    = record
+    { apex = c
+    ; sides = record { at = λ{ {★} → {!!} ; {𝓲 a} → {!!} } ; natural = {!!} }
+    ; triangle = {!!}
+    }
+  ; arr = {!!}
+  }
+-}

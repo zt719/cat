@@ -1,4 +1,3 @@
-
 module Category where
 
 open import Base
@@ -90,7 +89,7 @@ graph-as-Cat = record
                ; right-id = arrow-right-id
                ; assoc = arrow-assoc
                }
-    
+
 _op : Category {i} {j} → Category {i} {j}
 record { obj = obj ; hom = hom ; id = id ; _∘_ = _∘_ ; left-id = left-id ; right-id = right-id ; assoc = assoc } op
   = record
