@@ -3,7 +3,7 @@ module Data.Equality where
 open import Agda.Primitive
 open import Agda.Builtin.Equality public
 
-private variable i j : Level
+private variable i j k l m : Level
 
 postulate
   ext : {A : Set i} {B : Set j}
@@ -28,6 +28,32 @@ cong : {A : Set i} {B : Set j} {x₁ x₂ : A}
   → f x₁ ≡ f x₂
 cong f refl = refl
 
+cong₂ : {A : Set i} {B : Set j} {C : Set k}
+  → {x₁ x₂ : A} {y₁ y₂ : B}
+  → (f : A → B → C)
+  → x₁ ≡ x₂
+  → y₁ ≡ y₂
+  → f x₁ y₁ ≡ f x₂ y₂
+cong₂ f refl refl = refl
+
+cong₃ : {A : Set i} {B : Set j} {C : Set k} {D : Set l}
+  → {x₁ x₂ : A} {y₁ y₂ : B} {z₁ z₂ : C}
+  → (f : A → B → C → D)
+  → x₁ ≡ x₂
+  → y₁ ≡ y₂
+  → z₁ ≡ z₂
+  → f x₁ y₁ z₁ ≡ f x₂ y₂ z₂
+cong₃ f refl refl refl = refl
+
+cong₄ : {A : Set i} {B : Set j} {C : Set k} {D : Set l} {E : Set m}
+  → {x₁ x₂ : A} {y₁ y₂ : B} {z₁ z₂ : C} {p₁ p₂ : D}
+  → (f : A → B → C → D → E)
+  → x₁ ≡ x₂
+  → y₁ ≡ y₂
+  → z₁ ≡ z₂
+  → p₁ ≡ p₂
+  → f x₁ y₁ z₁ p₁ ≡ f x₂ y₂ z₂ p₂
+cong₄ f refl refl refl refl = refl
 
 ≡-refl : {A : Set i} {x : A}
   → x ≡ x

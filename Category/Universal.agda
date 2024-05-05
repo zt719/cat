@@ -4,7 +4,9 @@ open import Agda.Primitive
 open import Data.Equality
 open import Data.Nat
 open import Data.Empty
+open import Data.Unit
 open import Category.Category
+open import Category.Functor
 
 private variable i j : Level
 
@@ -16,12 +18,16 @@ record Initial (ℂ : Category {i} {j}) : Set (i ⊔ j) where
     absurd : (a : obj) → hom φ a
 open Initial
 
-0-as-initial-preorder : Initial PREORDER
-0-as-initial-preorder
+0-as-initial-PREORDER : Initial PREORDER
+0-as-initial-PREORDER
   = record { φ = zero ; absurd = λ n → z≤n }
 
-𝟘-as-initial-SET : Initial SET
-𝟘-as-initial-SET = record { φ = ⊥ ; absurd = λ a () }
+⊥-as-initial-SET : Initial SET
+⊥-as-initial-SET = record { φ = ⊥ ; absurd = λ a () }
+
+𝟘-as-initial-CAT : Initial CAT
+𝟘-as-initial-CAT
+  = record { φ = 𝟘 ; absurd = λ a → mkFunctor (λ ()) (λ ()) (λ {}) (λ {}) }
 
 record Terminal (ℂ : Category {i} {j}) : Set (i ⊔ j) where
   open Category.Category.Category ℂ
@@ -30,11 +36,18 @@ record Terminal (ℂ : Category {i} {j}) : Set (i ⊔ j) where
     unit : (a : obj) → hom a ＊
 open Terminal
 
-0-as-terminal-preorder-op : Terminal (PREORDER op)
-0-as-terminal-preorder-op = record { ＊ = 0 ; unit = λ n → z≤n }
+0-as-terminal-PREORDER-op : Terminal (PREORDER op)
+0-as-terminal-PREORDER-op = record { ＊ = 0 ; unit = λ n → z≤n }
 
-𝟘-as-terminal-SET-op : Terminal (SET op)
-𝟘-as-terminal-SET-op = record { ＊ = ⊥ ; unit = λ a () }
+⊥-as-terminal-SET-op : Terminal (SET op)
+⊥-as-terminal-SET-op = record { ＊ = ⊥ ; unit = λ a () }
+
+𝟙-as-terminal-CAT : Terminal CAT
+𝟙-as-terminal-CAT
+  = record
+  { ＊ = 𝟙
+  ; unit = λ a → mkFunctor (λ x → tt) (λ x → -tt→) refl refl
+  }
 
 record Isomorphism {ℂ : Category {i} {j}}
   (a b : Category.obj ℂ) : Set (i ⊔ j) where

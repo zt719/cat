@@ -51,8 +51,8 @@ record Limit {𝕀 : Category {i} {j}} (ℂ : Category {k} {l}) {D : 𝕀 ⇒ �
       → (_∘_) ℂ (component (sides limit) {a}) arr ≡ component (sides cone) {a}
 open Limit
 
-terminal-form-by-limit : (ℂ : Category {i} {j}) (c : obj ℂ) {D : EMPTY ⇒ ℂ}
-  → Limit {𝕀 = EMPTY} ℂ {D} 
+terminal-form-by-limit : (ℂ : Category {i} {j}) (c : obj ℂ) {D : 𝟘 ⇒ ℂ}
+  → Limit {𝕀 = 𝟘} ℂ {D} 
 terminal-form-by-limit ℂ c
   = record
   { limit = record { apex = c ; sides = record { component = λ {} ; commute = λ {} } ; triangle = λ () }

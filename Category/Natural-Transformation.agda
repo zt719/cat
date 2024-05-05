@@ -77,26 +77,26 @@ nt-trans
     }
   }
 
-_~∘~_ = nt-trans
+_~∘_ = nt-trans
 
 postulate
   nt-left-id :
     (α : F ~ G)
-    → nt-refl ~∘~ α ≡ α
+    → nt-refl ~∘ α ≡ α
     
   nt-right-id :
     (α : F ~ G)
-    → α ≡ α ~∘~ nt-refl
+    → α ≡ α ~∘ nt-refl
 
   nt-assoc :
     (α : H ~ J) (β : G ~ H) (γ : F ~ G)
-    → (α ~∘~ β) ~∘~ γ ≡ α ~∘~ (β ~∘~ γ)
+    → (α ~∘ β) ~∘ γ ≡ α ~∘ (β ~∘ γ)
 
 FUNC : {ℂ : Category {i} {j}} {𝔻 : Category {k} {l}} → Category
 FUNC {ℂ = ℂ} {𝔻 = 𝔻}
   = record
   { obj = ℂ ⇒ 𝔻
-  ; hom = _~_
+  ; hom = Natural-Transformation
   ; id = nt-refl
   ; _∘_ = nt-trans
   ; left-id = nt-left-id
@@ -144,4 +144,4 @@ func-nt-horizontal : {F F' : ℂ ⇒ 𝔻}
   → (G ⇒∘ F) ~ (G ⇒∘ F')
 func-nt-horizontal G α = id-nt G ~h α
 
-_~hr_ = nt-func-horizontal
+_~hr_ = func-nt-horizontal

@@ -30,22 +30,22 @@ record Monoid-Homomorphism (M : Monoid {i}) (N : Monoid {j}) : Set (i ⊔ j) whe
   open Monoid N renaming (_⊕_ to _⊛_)
   field
     map  : obj M → obj N
-    comp-law : {a b : obj M}
+    map-⊕ : {a b : obj M}
       → map (a ⊝ b) ≡ map a ⊛ map b
 open Monoid-Homomorphism
 
 _-M→_ = Monoid-Homomorphism
 
 mh-refl : M -M→ M
-mh-refl = record { map = →-refl ; comp-law = ≡-refl }
+mh-refl = record { map = →-refl ; map-⊕ = ≡-refl }
 
 mh-trans : N -M→ P → M -M→ N → M -M→ P
 mh-trans
-  record { map = map-f ; comp-law = comp-law-f}
-  record { map = map-g ; comp-law = comp-law-g}
+  record { map = map-f ; map-⊕ = map-⊕-f}
+  record { map = map-g ; map-⊕ = map-⊕-g}
   = record
   { map = map-f →∘ map-g
-  ; comp-law = comp-law-f ∙ cong map-f comp-law-g
+  ; map-⊕ = map-⊕-f ∙ cong map-f map-⊕-g
   }
 
 postulate
@@ -73,8 +73,8 @@ MON {i}
   ; assoc    = mh-assoc
   }
       
-ℕ-+ : Monoid
-ℕ-+
+ℕ-+-monoid : Monoid
+ℕ-+-monoid
   = record
   { obj = ℕ
   ; ε   = 0
@@ -84,8 +84,8 @@ MON {i}
   ; assoc    = +-assoc
   }
 
-ℕ-* : Monoid
-ℕ-*
+ℕ-*-monoid : Monoid
+ℕ-*-monoid
   = record
   { obj = ℕ
   ; ε   = 1
@@ -95,8 +95,8 @@ MON {i}
   ; assoc    = *-assoc
   }
 
-free : Set i → Monoid {i}
-free A
+free-monoid : Set i → Monoid {i}
+free-monoid A
   = record
   { obj = List A
   ; ε   = []

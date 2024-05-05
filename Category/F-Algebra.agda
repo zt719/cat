@@ -86,9 +86,3 @@ F-ALG {ℂ = ℂ} {F = F}
   ; assoc = F-Alg⇒-assoc
   }
 
-{-
-Lambek : {ℂ : Category {i} {j}} {F : Endofunctor ℂ}
-  → (init : Initial (F-Alg-Cat {ℂ = ℂ} {F = F}))
-  → map F (carrier (Initial.initial init)) ≅ carrier (Initial.initial init)
-Lambek = {!!}
--}

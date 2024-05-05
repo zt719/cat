@@ -24,7 +24,7 @@ record Category : Set (lsuc (i ⊔ j)) where
     assoc    : {a b c d : obj}
       → (f : hom c d) (g : hom b c) (h : hom a b)
       → (f ∘ g) ∘ h ≡ f ∘ (g ∘ h)
-open Category
+open Category  
 
 SET : Category
 SET
@@ -75,27 +75,39 @@ M*
   ; assoc    = *-assoc
   }
 
-EMPTY : Category
-EMPTY = record
-        { obj = ⊥
-        ; hom = _⊥⇒_
-        ; id = λ {}
-        ; _∘_ = λ _ ()
-        ; left-id = λ ()
-        ; right-id = λ ()
-        ; assoc = λ _ _ ()
-        }
+𝟘 : Category
+𝟘 = record
+  { obj = ⊥
+  ; hom = _-⊥→_
+  ; id = λ {}
+  ; _∘_ = λ _ ()
+  ; left-id = λ ()
+  ; right-id = λ ()
+  ; assoc = λ _ _ ()
+  }
+
+𝟙 : Category
+𝟙 = record
+  { obj = ⊤
+  ; hom = _-⊤→_
+  ; id = -tt→
+  ; _∘_ = λ{ -tt→ -tt→ → -tt→ }
+  ; left-id = λ{ -tt→ → refl }
+  ; right-id = λ{ -tt→ → refl }
+  ; assoc = λ{ -tt→ -tt→ -tt→ → refl }
+  }
 
 GRAPH : Category
-GRAPH = record
-               { obj = Point
-               ; hom = Arrow
-               ; id = arrow-refl
-               ; _∘_ = arrow-trans
-               ; left-id = arrow-left-id
-               ; right-id = arrow-right-id
-               ; assoc = arrow-assoc
-               }
+GRAPH
+  = record
+  { obj = Point
+  ; hom = Arrow
+  ; id = arrow-refl
+  ; _∘_ = arrow-trans
+  ; left-id = arrow-left-id
+  ; right-id = arrow-right-id
+  ; assoc = arrow-assoc
+  }
 
 _op : Category {i} {j} → Category {i} {j}
 record { obj = obj ; hom = hom ; id = id ; _∘_ = _∘_ ; left-id = left-id ; right-id = right-id ; assoc = assoc } op
