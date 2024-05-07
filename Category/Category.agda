@@ -19,10 +19,11 @@ record Category : Set (lsuc (i ⊔ j)) where
     _∘_ : {a b c : obj}
       → hom b c → hom a b → hom a c
 
-    left-id  : {a b : obj} → (f : hom a b) → id ∘ f ≡ f
-    right-id : {a b : obj} → (f : hom a b) → f ≡ f ∘ id
-    assoc    : {a b c d : obj}
-      → (f : hom c d) (g : hom b c) (h : hom a b)
+    left-id  : {a b : obj} (f : hom a b)
+      → id ∘ f ≡ f
+    right-id : {a b : obj} (f : hom a b)
+      → f ≡ f ∘ id
+    assoc    : {a b c d : obj} (f : hom c d) (g : hom b c) (h : hom a b)
       → (f ∘ g) ∘ h ≡ f ∘ (g ∘ h)
 open Category  
 

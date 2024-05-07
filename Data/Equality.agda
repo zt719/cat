@@ -85,3 +85,19 @@ _∙_ = ≡-trans
   → (p ∙ q) ∙ r ≡ p ∙ (q ∙ r)
 ≡-assoc refl refl refl = refl
 
+infix 4 _≅_
+
+data _≅_ {A : Set i} (x : A) : {B : Set j} → B → Set i where
+   refl : x ≅ x
+
+≅-to-≡ : {x y : Set i} → x ≅ y → x ≡ y
+≅-to-≡ refl = refl
+
+≡-to-≅ : {x y : Set i} → x ≡ y → x ≅ y
+≡-to-≅ refl = refl
+
+≅-cong₂ : ∀ {A : Set i} {B : A → Set j} {C : (x : A) → B x → Set k} {x y u v}
+        (f : (x : A) (y : B x) → C x y) → x ≅ y → u ≅ v → f x u ≅ f y v
+≅-cong₂ f refl refl = refl
+
+

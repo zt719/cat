@@ -25,52 +25,57 @@ private variable N : Monoid {j}
 private variable P : Monoid {k}
 private variable Q : Monoid {l}
 
-record Monoid-Homomorphism (M : Monoid {i}) (N : Monoid {j}) : Set (i ⊔ j) where
-  open Monoid M renaming (_⊕_ to _⊝_)
-  open Monoid N renaming (_⊕_ to _⊛_)
+record _-Monoid→_ (M : Monoid {i}) (N : Monoid {j}) : Set (i ⊔ j) where
+  open Monoid M renaming (_⊕_ to _⊝_; ε to m)
+  open Monoid N renaming (_⊕_ to _⊛_; ε to n)
   field
     map  : obj M → obj N
+    map-ε : map m ≡ n
     map-⊕ : {a b : obj M}
       → map (a ⊝ b) ≡ map a ⊛ map b
-open Monoid-Homomorphism
+open _-Monoid→_
 
-_-M→_ = Monoid-Homomorphism
+-m→-refl : M -Monoid→ M
+-m→-refl
+  = record
+  { map = →-refl
+  ; map-ε = ≡-refl
+  ; map-⊕ = ≡-refl
+  }
 
-mh-refl : M -M→ M
-mh-refl = record { map = →-refl ; map-⊕ = ≡-refl }
-
-mh-trans : N -M→ P → M -M→ N → M -M→ P
-mh-trans
-  record { map = map-f ; map-⊕ = map-⊕-f}
-  record { map = map-g ; map-⊕ = map-⊕-g}
+-m→-trans : N -Monoid→ P → M -Monoid→ N → M -Monoid→ P
+-m→-trans
+  record { map = map-f ; map-ε = map-ε-f ; map-⊕ = map-⊕-f}
+  record { map = map-g ; map-ε = map-ε-g ; map-⊕ = map-⊕-g}
   = record
   { map = map-f →∘ map-g
+  ; map-ε = map-ε-f ∙ cong map-f map-ε-g
   ; map-⊕ = map-⊕-f ∙ cong map-f map-⊕-g
   }
 
 postulate
-  mh-left-id : 
-    (f : M -M→ N)
-    → mh-trans mh-refl f ≡ f
+  -m→-left-id : 
+    (f : M -Monoid→ N)
+    → -m→-trans -m→-refl f ≡ f
 
-  mh-right-id : 
-    (f : M -M→ N)
-    → f ≡ mh-trans f mh-refl
+  -m→-right-id : 
+    (f : M -Monoid→ N)
+    → f ≡ -m→-trans f -m→-refl
 
-  mh-assoc :
-    (f : P -M→ Q) (g : N -M→ P) (h : M -M→ N)
-    → mh-trans (mh-trans f g) h ≡ mh-trans f (mh-trans g h)
+  -m→-assoc :
+    (f : P -Monoid→ Q) (g : N -Monoid→ P) (h : M -Monoid→ N)
+    → -m→-trans (-m→-trans f g) h ≡ -m→-trans f (-m→-trans g h)
 
 MON : Category {lsuc i} {i}
 MON {i}
   = record
   { obj = Monoid {i}
-  ; hom = _-M→_
-  ; id  = mh-refl
-  ; _∘_ = mh-trans
-  ; left-id  = mh-left-id
-  ; right-id = mh-right-id
-  ; assoc    = mh-assoc
+  ; hom = _-Monoid→_
+  ; id  = -m→-refl
+  ; _∘_ = -m→-trans
+  ; left-id  = -m→-left-id
+  ; right-id = -m→-right-id
+  ; assoc    = -m→-assoc
   }
       
 ℕ-+-monoid : Monoid

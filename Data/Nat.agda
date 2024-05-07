@@ -89,6 +89,3 @@ data _≤_ : ℕ → ℕ → Set where
   *-+-dist zero    b c = refl
   *-+-dist (suc a) b c = ≡-sym (+-assoc c (a * c) (b * c))
     ∙ cong (c +_) (*-+-dist a b c)
-
-
-

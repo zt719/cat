@@ -2,7 +2,6 @@ module Category.Functor where
 
 open import Agda.Primitive
 open import Data.Equality
-open import Data.Heterogeneous-Equality
 open import Data.Function
 open import Data.Maybe
 open import Data.List
@@ -56,18 +55,6 @@ func-trans
     
 _⇒∘_ = func-trans
 
-
-{-
-open Category.Category.Category using (obj; hom)
-FEq : (s t : ℂ ⇒ 𝔻) {a b c : obj ℂ} {f : hom ℂ b c} {g : hom ℂ a b}
-  → map₀ s ≡ map₀ t
-  → map₁ s {a} {b} ≅ map₁ t {a} {b}
-  → map-id s {a} ≅ map-id t {a}
-  → map-∘ s {a} {b} {c} {f} {g} ≅ map-∘ t {a} {b} {c} {f} {g}
-  → s ≅ t
-FEq (mkFunctor map₂ map₃ map-id₁ map-∘₁) (mkFunctor .map₂ map₅ map-id₂ map-∘₂) refl b c d = {!!}
--}
-
 postulate
   func-left-id :
     (F : ℂ ⇒ 𝔻)
@@ -81,7 +68,7 @@ postulate
     (F : 𝔼 ⇒ 𝔽) (G : 𝔻 ⇒ 𝔼) (H : ℂ ⇒ 𝔻)
     → (F ⇒∘ G) ⇒∘ H ≡ F ⇒∘ (G ⇒∘ H)
 
-CAT : ∀ {i j} → Category
+CAT : {i j : Level} → Category
 CAT {i} {j}
   = record
   { obj = Category {i} {j}
@@ -93,33 +80,14 @@ CAT {i} {j}
   ; assoc = func-assoc
   }
 
-
 maybe-functor : Endofunctor SET
 maybe-functor
   = record
   { map₀ = Maybe
   ; map₁ = maybe-map₁
-  ; map-id = ext λ{ (just a) → refl ; nothing → refl}
-  ; map-∘ = ext λ { (just a) → refl ; nothing → refl}
+  ; map-id = ext maybe-map₁-id'
+  ; map-∘ = ext maybe-map₁-∘'
   }
-  where
-  maybe-map₁ : ∀ {A B} → (A → B) → Maybe A → Maybe B
-  maybe-map₁ f (just a) = just (f a)
-  maybe-map₁ f nothing  = nothing
-
-list-map₁ : {A : Set i} {B : Set j} → (A → B) → List A → List B
-list-map₁ f [] = []
-list-map₁ f (a ∷ as) = f a ∷ list-map₁ f as
-
-list-map-id' : {A : Set i} → (as : List A) → list-map₁ →-refl as ≡ →-refl as
-list-map-id' [] = refl
-list-map-id' (l₇ ∷ as) = cong (→-refl l₇ ∷_) (list-map-id' as)
-
-list-map-∘' : {A : Set i} {B : Set j} {C : Set k} → {f : B → C} {g : A → B}
-  → (as : List A)
-  → list-map₁ (→-trans f g) as ≡ →-trans (list-map₁ f) (list-map₁ g) as
-list-map-∘' [] = refl
-list-map-∘' {f = f} {g = g} (a ∷ as) = cong (→-trans f g a ∷_) (list-map-∘' as)
 
 list-functor : Endofunctor SET
 list-functor
@@ -131,17 +99,13 @@ list-functor
   }
 
 forgetful-functor : MON ⇒ SET
-forgetful-functor = record
+forgetful-functor
+  = record
   { map₀ = Monoid.obj
-  ; map₁ = Monoid-Homomorphism.map
-  ; map-id = refl
-  ; map-∘  = refl
+  ; map₁ = _-Monoid→_.map
+  ; map-id = ≡-refl
+  ; map-∘  = ≡-refl
   }
-
-list-map₁-++ : {A : Set i} {B : Set i} → (f : A → B) → (as bs : List A)
-  → list-map₁ f (as ++ bs) ≡ list-map₁ f as ++ list-map₁ f bs
-list-map₁-++ f [] bs = refl
-list-map₁-++ f (x ∷ as) bs = cong (f x ∷_) (list-map₁-++ f as bs)
 
 {-
 free-functor : SET ⇒ MON

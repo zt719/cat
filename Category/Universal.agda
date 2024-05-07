@@ -59,8 +59,6 @@ record Isomorphism {ℂ : Category {i} {j}}
     to∘from : id {b} ≡ to ∘ from
 open Isomorphism
 
-_≅_ = Isomorphism
-
 record Product {ℂ : Category {i} {j}}
   (a b : Category.obj ℂ) : Set (i ⊔ j) where
   constructor _ẋ_
