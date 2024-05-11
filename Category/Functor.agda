@@ -16,7 +16,6 @@ private variable 𝔽 : Category {p} {q}
 
 record Functor (ℂ : Category {i} {j} ) (𝔻 : Category {k} {l})
   : Set (i ⊔ j ⊔ k ⊔ l) where
-  constructor mkFunctor
   open Category.Category.Category ℂ renaming (_∘_ to _∘ℂ_)
   open Category.Category.Category 𝔻 renaming (_∘_ to _∘𝔻_)
   field

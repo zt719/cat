@@ -6,7 +6,6 @@ open import Data.Nat
 open import Data.Maybe
 open import Category.Category
 open import Category.Functor
-open import Category.Universal
 
 private variable i j : Level
 

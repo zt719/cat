@@ -113,23 +113,23 @@ GRAPH
 _op : Category {i} {j} → Category {i} {j}
 record { obj = obj ; hom = hom ; id = id ; _∘_ = _∘_ ; left-id = left-id ; right-id = right-id ; assoc = assoc } op
   = record
-     { obj = obj
-     ; hom = λ a b → hom b a
-     ; id = id
-     ; _∘_ = λ f g → g ∘ f
-     ; left-id = λ f → ≡-sym (right-id f)
-     ; right-id = λ f → ≡-sym (left-id f)
-     ; assoc = λ f g h → ≡-sym (assoc h g f)
-     }
+  { obj = obj
+  ; hom = λ a b → hom b a
+  ; id = id
+  ; _∘_ = λ f g → g ∘ f
+  ; left-id = λ f → ≡-sym (right-id f)
+  ; right-id = λ f → ≡-sym (left-id f)
+  ; assoc = λ f g h → ≡-sym (assoc h g f)
+  }
 
 FIN : ℕ → Category
 FIN k
   = record
-     { obj = Fin k
-     ; hom = Fin⇒ k
-     ; id = Fin⇒-refl k
-     ; _∘_ = Fin⇒-trans k
-     ; left-id = Fin⇒-left-id k
-     ; right-id = Fin⇒-right-id k
-     ; assoc = Fin⇒-assoc k
-     }
+  { obj = Fin k
+  ; hom = Fin⇒ k
+  ; id = Fin⇒-refl k
+  ; _∘_ = Fin⇒-trans k
+  ; left-id = Fin⇒-left-id k
+  ; right-id = Fin⇒-right-id k
+  ; assoc = Fin⇒-assoc k
+  }
