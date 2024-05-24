@@ -1,14 +1,9 @@
-module Category.Natural-Transformation where
+module Natural-Transformation where
 
-open import Agda.Primitive
-open import Data.Equality
-open import Data.Maybe
-open import Data.List
-open import Data.Function 
-open import Category.Category
-open import Category.Functor
+open import Base
+open import Category
+open import Functor
 
-private variable i j k l m n p q : Level
 private variable ℂ : Category {i} {j}
 private variable 𝔻 : Category {k} {l}
 private variable 𝔼 : Category {m} {n}
@@ -18,22 +13,19 @@ private variable F G H J : ℂ ⇒ 𝔻
 
 record Natural-Transformation {ℂ : Category {i} {j}} {𝔻 : Category {k} {l}}
   (F G : ℂ ⇒ 𝔻) : Set (i ⊔ j ⊔ k ⊔ l) where
-  open Category.Category.Category using (obj; hom)
-  open Category.Category.Category 𝔻 using (_∘_)
-  open Category.Functor.Functor F renaming (map₀ to F₀; map₁ to F₁)
-  open Category.Functor.Functor G renaming (map₀ to G₀; map₁ to G₁)  
+  open Category.Category using (obj; hom)
+  open Functor.Functor
+  private _∘_ = Category._∘_ 𝔻
+  private F₀ = Functor.map₀ F
+  private F₁ = Functor.map₁ F
+  private G₀ = Functor.map₀ G
+  private G₁ = Functor.map₁ G
   field
     component : {a : obj ℂ} → hom 𝔻 (F₀ a) (G₀ a)
     commute : {a b : obj ℂ} {f : hom ℂ a b}
       → (component {b}) ∘ (F₁ f) ≡ (G₁ f) ∘ (component {a})
-open Natural-Transformation
 
 _~_ = Natural-Transformation
-
-head : {A : Set i}
-  → List A → Maybe A
-head [] = nothing
-head (a ∷ as) = just a
 
 head-as-nt : list-functor ~ maybe-functor
 head-as-nt = record
@@ -103,7 +95,6 @@ FUNC {ℂ = ℂ} {𝔻 = 𝔻}
   ; right-id = nt-right-id
   ; assoc = nt-assoc
   }
-
 
 nt-horizontal : {F G : ℂ ⇒ 𝔻} {H J : 𝔻 ⇒ 𝔼}
   → (α : H ~ J)

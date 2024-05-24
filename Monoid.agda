@@ -1,14 +1,7 @@
-module Category.Monoid where
+module Monoid where
 
-open import Agda.Primitive
-open import Data.Equality
-open import Data.Function
-open import Data.Nat
-open import Data.List
-open import Data.Unit
-open import Category.Category
-
-private variable i j k l : Level
+open import Base
+open import Category
 
 record Monoid : Set (lsuc i) where
   field
@@ -26,11 +19,11 @@ private variable P : Monoid {k}
 private variable Q : Monoid {l}
 
 record _-Monoid→_ (M : Monoid {i}) (N : Monoid {j}) : Set (i ⊔ j) where
-  open Monoid M renaming (_⊕_ to _⊝_; ε to m)
-  open Monoid N renaming (_⊕_ to _⊛_; ε to n)
+  open Monoid M renaming (_⊕_ to _⊝_; ε to εm)
+  open Monoid N renaming (_⊕_ to _⊛_; ε to εn)
   field
     map  : obj M → obj N
-    map-ε : map m ≡ n
+    map-ε : map εm ≡ εn
     map-⊕ : {a b : obj M}
       → map (a ⊝ b) ≡ map a ⊛ map b
 open _-Monoid→_
