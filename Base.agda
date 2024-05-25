@@ -11,7 +11,7 @@ open import Data.Empty public
 open import Data.Unit public
   using (⊤; tt)
 open import Data.Product public
-  using (_×_; _,_; proj₁; proj₂)
+  using (Σ; Σ-syntax; _×_; _,_; proj₁; proj₂)
 open import Data.Sum public
   using (_⊎_; inj₁; inj₂)
 open import Data.Fin public
@@ -68,6 +68,7 @@ _∙_ = ≡-trans
   → (B → C) → (A → B) → (A → C)
 →-trans f g x = f (g x)
 
+infixl 5 _→∘_
 _→∘_ = →-trans
 
 →-left-id : {A : Set i} {B : Set j}

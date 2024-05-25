@@ -24,6 +24,8 @@ record Functor (ℂ : Category {i} {j} ) (𝔻 : Category {k} {l})
 
 _⇒_ = Functor
 
+Covariant = Functor
+
 record Contravariant (ℂ : Category {i} {j} ) (𝔻 : Category {k} {l})
   : Set (i ⊔ j ⊔ k ⊔ l) where
   open Category.Category
@@ -92,8 +94,7 @@ Endofunctor : Category {i} {j} → Set (i ⊔ j)
 Endofunctor ℂ = ℂ ⇒ ℂ
 
 func-refl : ℂ ⇒ ℂ
-func-refl
-  = record
+func-refl = record
   { map₀ = →-refl
   ; map₁ = →-refl
   ; map-id = ≡-refl
@@ -127,8 +128,7 @@ postulate
     → (F ⇒∘ G) ⇒∘ H ≡ F ⇒∘ (G ⇒∘ H)
 
 CAT : {i j : Level} → Category
-CAT {i} {j}
-  = record
+CAT {i} {j} = record
   { obj = Category {i} {j}
   ; hom = Functor
   ; id = func-refl
@@ -139,8 +139,7 @@ CAT {i} {j}
   }
 
 maybe-functor : Endofunctor SET
-maybe-functor
-  = record
+maybe-functor = record
   { map₀ = Maybe
   ; map₁ = maybe-map₁
   ; map-id = ext maybe-map₁-id'
@@ -148,8 +147,7 @@ maybe-functor
   }
 
 list-functor : Endofunctor SET
-list-functor
-  = record
+list-functor = record
   { map₀  = List
   ; map₁ = list-map₁
   ; map-id = ext list-map-id'
@@ -157,8 +155,7 @@ list-functor
   }
 
 forgetful-functor : MON ⇒ SET
-forgetful-functor
-  = record
+forgetful-functor = record
   { map₀ = Monoid.obj
   ; map₁ = _-Monoid→_.map
   ; map-id = ≡-refl
@@ -180,3 +177,16 @@ id-functor :
   (ℂ : Category {i} {j})
   → Endofunctor ℂ
 id-functor ℂ = func-refl
+
+open Category.Category
+open Functor
+is-faithful : {ℂ : Category {i} {j}} {𝔻 : Category {k} {l}}
+  → (F : ℂ ⇒ 𝔻) → Set (i ⊔ j ⊔ l)
+is-faithful {ℂ = ℂ} F
+  = (a b : obj ℂ) (f g : hom ℂ a b) → (map₁ F f ≡ map₁ F g) → f ≡ g
+
+is-full : {ℂ : Category {i} {j}} {𝔻 : Category {k} {l}}
+  → (F : ℂ ⇒ 𝔻) → Set (i ⊔ j ⊔ l)
+is-full {ℂ = ℂ} {𝔻 = 𝔻} F
+  = (a b : obj ℂ) (f : hom ℂ a b) (g : hom 𝔻 (map₀ F a) (map₀ F b))
+  → Σ[ f ∈ hom ℂ a b ] map₁ F f ≡ g 

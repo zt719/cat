@@ -84,11 +84,11 @@ postulate
     (α : H ~ J) (β : G ~ H) (γ : F ~ G)
     → (α ~∘ β) ~∘ γ ≡ α ~∘ (β ~∘ γ)
 
-FUNC : {ℂ : Category {i} {j}} {𝔻 : Category {k} {l}} → Category
-FUNC {ℂ = ℂ} {𝔻 = 𝔻}
-  = record
+[_,_] : (ℂ : Category {i} {j}) (𝔻 : Category {k} {l})
+  → Category {i ⊔ j ⊔ k ⊔ l} {i ⊔ j ⊔ k ⊔ l}
+[ ℂ , 𝔻 ] = record
   { obj = ℂ ⇒ 𝔻
-  ; hom = Natural-Transformation
+  ; hom = _~_
   ; id = nt-refl
   ; _∘_ = nt-trans
   ; left-id = nt-left-id
