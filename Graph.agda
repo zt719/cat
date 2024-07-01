@@ -5,7 +5,7 @@ open import Category
 open import Functor
 open import Natural-Transformation
 
-open Category.Category renaming (id to id-rule)
+open Category.Category hiding (id)
 open Functor.Functor
 
 data Vertex : Set where
@@ -13,8 +13,7 @@ data Vertex : Set where
 
 data Hom : (v1 v2 : Vertex) → Set where
   id : (v : Vertex) → Hom v v
-  s : Hom E V
-  t : Hom E V
+  s t  : Hom E V
 
 𝕀 : Category
 𝕀 = record
@@ -142,11 +141,12 @@ Hom[_,-] x = record
   }
 
 G₀ = map₀ G
+G₁ = map₁ G
 
 φ : {X : obj 𝕀}
   → G₀ X → Hom[ X ,-] ~ G
 φ x = record
-  { component = λ f → map₁ G f x
+  { component = λ f → G₁ f x
   ; commute = λ
     { {f = (id E)} → ext λ{ (id E) → refl}
     ; {f = (id V)} → ext λ{ (id V) → refl ; s → refl ; t → refl}

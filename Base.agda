@@ -22,6 +22,8 @@ open import Data.List public
 open import Data.Maybe public
   using (Maybe; just; nothing)
   renaming (map to maybe-map₁)
+open import Function public
+  using (flip)
 
 variable i j k l m n p q : Level
 

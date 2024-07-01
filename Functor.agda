@@ -156,8 +156,8 @@ list-functor = record
 
 forgetful-functor : MON ⇒ SET
 forgetful-functor = record
-  { map₀ = Monoid.obj
-  ; map₁ = _-Monoid→_.map
+  { map₀ = Mon.obj
+  ; map₁ = _-Mon→_.map
   ; map-id = ≡-refl
   ; map-∘  = ≡-refl
   }

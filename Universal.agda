@@ -6,6 +6,7 @@ open import Functor
 
 open Category.Category
 
+{-
 record Isomorphism {ℂ : Category {i} {j}}
   (a b : obj ℂ) : Set (i ⊔ j) where
   private _∘ℂ_ = Category._∘_ ℂ
@@ -14,59 +15,64 @@ record Isomorphism {ℂ : Category {i} {j}}
     from : hom ℂ b a
     from∘to : from ∘ℂ to ≡ id ℂ {a}
     to∘from : id ℂ {b} ≡ to ∘ℂ from
-
+-}
 
 record Initial (ℂ : Category {i} {j}) : Set (i ⊔ j) where
   field
-    φ : obj ℂ
-    absurd : (a : obj ℂ) → hom ℂ φ a
+    𝟎 : obj ℂ
+    !₀ : {a : obj ℂ} → hom ℂ 𝟎 a
 
 0-as-initial-PREORDER : Initial PREORDER
 0-as-initial-PREORDER
-  = record { φ = zero ; absurd = λ n → z≤n }
+  = record { 𝟎 = zero ; !₀ = z≤n }
 
 ⊥-as-initial-SET : Initial SET
-⊥-as-initial-SET = record { φ = ⊥ ; absurd = λ a () }
+⊥-as-initial-SET = record { 𝟎 = ⊥ ; !₀ = λ () }
 
 𝟘-as-initial-CAT : Initial CAT
 𝟘-as-initial-CAT
-  = record { φ = 𝟘 ; absurd = λ a → record { map₀ = λ () ; map₁ = λ () ; map-id = λ {} ; map-∘ = λ {} }}
+  = record { 𝟎 = 𝟘 ; !₀ = record { map₀ = λ () ; map₁ = λ () ; map-id = λ {} ; map-∘ = λ {} }}
 
 record Terminal (ℂ : Category {i} {j}) : Set (i ⊔ j) where
   field
-    ＊ : obj ℂ
-    unit : (a : obj ℂ) → hom ℂ a ＊
+    𝟏 : obj ℂ
+    !₁ : {a : obj ℂ} → hom ℂ a 𝟏
 
 0-as-terminal-PREORDER-op : Terminal (PREORDER op)
 0-as-terminal-PREORDER-op
   = record
-  { ＊ = 0
-  ; unit = λ n → z≤n {n}
+  { 𝟏 = 0
+  ; !₁ = z≤n
   }
 
 ⊥-as-terminal-SET-op : Terminal (SET op)
-⊥-as-terminal-SET-op = record { ＊ = ⊥ ; unit = λ _ () }
+⊥-as-terminal-SET-op = record { 𝟏 = ⊥ ; !₁ = λ () }
 
 ⊤-as-terminal-SET : Terminal SET
-⊤-as-terminal-SET = record { ＊ = ⊤ ; unit = λ _ _ → tt }
+⊤-as-terminal-SET = record { 𝟏 = ⊤ ; !₁ = λ _ → tt }
 
 𝟙-as-terminal-CAT : Terminal CAT
 𝟙-as-terminal-CAT
   = record
-  { ＊ = 𝟙
-  ; unit = λ a → record { map₀ = (λ x → tt); map₁ = (λ x → -tt→); map-id = refl; map-∘ = refl }
+  { 𝟏 = 𝟙
+  ; !₁ = record
+    { map₀ = λ _ → tt
+    ; map₁ = λ _ → -tt→
+    ; map-id = refl
+    ; map-∘ = refl
+    }
   }
 
 record Product {ℂ : Category {i} {j}}
   (a b : Category.obj ℂ) : Set (i ⊔ j) where
   field
     product : obj ℂ
-    prjˡ : hom ℂ product a
-    prjʳ : hom ℂ product b
+    projˡ : hom ℂ product a
+    projʳ : hom ℂ product b
 
 ×-as-product-SET : (A B : Category.obj SET) → Product {ℂ = SET} A B
 ×-as-product-SET A B
-  = record { product = A × B ; prjˡ = proj₁ ; prjʳ = proj₂ }
+  = record { product = A × B ; projˡ = proj₁ ; projʳ = proj₂ }
 
 record Coproduct {ℂ : Category {i} {j}}
   (a b : Category.obj ℂ) : Set (i ⊔ j) where
